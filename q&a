@@ -1,1 +1,85 @@
 I am currently building a hexapod robot. the motherboard is an arduino mega 2560 and has an ESP32 bluetooth module connected via rx tx pins.The robot crawls forward when turned on. I would like to control the movements via bluetooth. I want a react app to transmit data to my arduino mega/esp32s and vice versa. I have seuccessfully integrated the arduino ide into VS code using platformio. My current issue is with library compatability. I cant seem to find a library that reconciles arduino and bluetooth functionality. I keep running into caompatability issues between arduino and bluetooth libraries when compiling. Ive tried nimBLE, Gamepad and Blynk so far. 
+
+
+
+
+I am now able to view "crawl_forward" in the arduino ide serial monitor upon clicking
+"move_forward" button in my react app. However, my hexapod is not responding to the
+command. Upon receiving "crawl_forward" in main.js, crawlForward(); function should 
+execute and activate the servo objects within my arduino code. Below is
+a link to my github repositories
+
+https://github.com/jasonronalddavis/Hexapod-control-react-app
+
+https://github.com/jasonronalddavis/Arduino-Hexapod-App
+
+Here is my updated esp32s code
+
+#include <NimBLEDevice.h>
+#include <NimBLEUtils.h>
+#include <NimBLEServer.h>
+
+BLEServer *pServer = nullptr;
+BLECharacteristic *pCharacteristic = nullptr;
+bool deviceConnected = false;
+int txValue = 0;
+
+#define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
+#define CHARACTERISTIC_UUID_RX "beb5483e-36e1-4688-b7f5-ea07361b26a8"
+
+HardwareSerial SerialBLE(2); // Use Serial2 for Bluetooth (you can choose a different UART)
+
+class MyServerCallbacks : public NimBLEServerCallbacks {
+  void onConnect(NimBLEServer *pServer) {
+    deviceConnected = true;
+    Serial.println("Device connected");
+  }
+
+  void onDisconnect(NimBLEServer *pServer) {
+    deviceConnected = false;
+    Serial.println("Device disconnected");
+  }
+};
+
+class MyCallbacks : public NimBLECharacteristicCallbacks {
+  void onWrite(NimBLECharacteristic *pCharacteristic) {
+    std::string rxValue = pCharacteristic->getValue();
+    if (rxValue.length() > 0) {
+      Serial.print("Received Value: ");
+      Serial.println(rxValue.c_str());
+      SerialBLE.println(rxValue.c_str());
+    }
+  }
+};
+
+void setup() {
+  Serial.begin(115200);
+  SerialBLE.begin(115200, SERIAL_8N1, 16, 17); // RX, TX pins for Serial2 on ESP32
+
+  NimBLEDevice::init("PEANUT");
+  pServer = NimBLEDevice::createServer();
+  pServer->setCallbacks(new MyServerCallbacks());
+
+  NimBLEService *pService = pServer->createService(SERVICE_UUID);
+  pCharacteristic = pService->createCharacteristic(
+      CHARACTERISTIC_UUID_RX,
+      NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::NOTIFY);
+  pCharacteristic->setCallbacks(new MyCallbacks());
+
+  pService->start();
+  NimBLEAdvertising *pAdvertising = pServer->getAdvertising();
+  pAdvertising->start();
+  Serial.println("Waiting for a client connection to notify...");
+}
+
+void loop() {
+  if (deviceConnected) {
+    // Your main code here
+
+    // Example: Sending data to the client
+    pCharacteristic->setValue(String(txValue));
+    pCharacteristic->notify();
+    txValue++;
+    delay(10);
+  }
+}
