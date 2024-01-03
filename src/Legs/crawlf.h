@@ -15,5 +15,5 @@ void standFunction();
 void flexFunction();
 void stretch();
 void crawlForward();
-
+void defaultMove();
 #endif

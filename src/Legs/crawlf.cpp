@@ -420,3 +420,14 @@ crawlTwo();
  delay(170);
  crawlFour();
 }
+
+  void defaultMove(){
+stretch();
+ delay(2000);
+ liftFunction();
+ delay(500);
+ standFunction();
+ delay(500);
+ flexFunction();
+ standFunction();
+}

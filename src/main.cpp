@@ -7,8 +7,10 @@
 
 #define espSerial Serial1
 
-bool isBTSerialAvailable();
+// bool isBTSerialAvailable();
 void processBluetoothData(const String& data);
+// bool crawlCommandReceived = false;
+
 
 void setup() {
   Serial1.begin(115200);  // Initialize Serial1 for debugging
@@ -20,20 +22,18 @@ void setup() {
 }
 
 void loop() {
+//move leg servos to 90 degrees
+stretch();
   // Process Bluetooth data if available
   if (Serial1.available()) {
     String receivedData = Serial1.readStringUntil('\n');
     processBluetoothData(receivedData);
   }
-
-  // Your other code or delays as needed
-  delay(100); // Adjust delay as needed
+  // other code or delays as needed
+  delay(1000); // Adjust delay as needed
 }
 
 
-bool isBTSerialAvailable() {
-  return espSerial.available() > 0;
-}
 
 void processBluetoothData(const String& data) {
   Serial1.print("Received data: ");
@@ -42,6 +42,9 @@ void processBluetoothData(const String& data) {
   if (data == "crawl_forward") {
     crawlForward();
   } else {
-    // Handle other commands or data as needed
+//nothing
   }
 }
+
+
+

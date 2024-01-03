@@ -1,40 +1,51 @@
-/*
- * A simple sketch that maps a single pin on the ESP32 to a single button on the controller
- */
-
 #include <Arduino.h>
-#include <BleGamepad.h> // https://github.com/lemmingDev/ESP32-BLE-Gamepad
+#include <Servo.h>
+#include "Eyes/eyes.h"
+#include "legs/crawlf.h"
+#include "Mouth/mouth.h"
+#include <Wire.h>
 
-#define BUTTONPIN 35 // Pin button is attached to
+#define espSerial Serial1
 
-BleGamepad bleGamepad;
+bool isBTSerialAvailable();
+void processBluetoothData(const String& data);
 
-int previousButton1State = HIGH;
-
-void setup()
-{
-    pinMode(BUTTONPIN, INPUT_PULLUP);
-    bleGamepad.begin();
+void setup() {
+  Serial1.begin(115200);  // Initialize Serial1 for debugging
+  espSerial.begin(115200);  // Use Serial1 for communication with ESP32
+  initEyes();
+  initLegs();
+  initMouth();
+  Serial1.println("Setup completed");
 }
 
-void loop()
-{
-    if (bleGamepad.isConnected())
-    {
+void loop() {
+stretch();
+ delay(2000);
+ liftFunction();
+ delay(500);
+ standFunction();
+ delay(500);
+ flexFunction();
+ standFunction();
+  // Process Bluetooth data if available
+  if (Serial1.available()) {
+    String receivedData = Serial1.readStringUntil('\n');
+    processBluetoothData(receivedData);
+  }
 
-        int currentButton1State = digitalRead(BUTTONPIN);
+  // Your other code or delays as needed
+  delay(1000); // Adjust delay as needed
+}
 
-        if (currentButton1State != previousButton1State)
-        {
-            if (currentButton1State == LOW)
-            {
-                bleGamepad.press(BUTTON_1);
-            }
-            else
-            {
-                bleGamepad.release(BUTTON_1);
-            }
-        }
-        previousButton1State = currentButton1State;
-    }
+bool isBTSerialAvailable() {
+  return espSerial.available() > 0;
+}
+
+void processBluetoothData(const String& data) {
+  Serial1.print("Received data: ");
+  Serial1.println(data);
+
+  // Execute crawlForward() for any received data
+  crawlForward();
 }
