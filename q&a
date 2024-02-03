@@ -1,85 +1,215 @@
-I am currently building a hexapod robot. the motherboard is an arduino mega 2560 and has an ESP32 bluetooth module connected via rx tx pins.The robot crawls forward when turned on. I would like to control the movements via bluetooth. I want a react app to transmit data to my arduino mega/esp32s and vice versa. I have seuccessfully integrated the arduino ide into VS code using platformio. My current issue is with library compatability. I cant seem to find a library that reconciles arduino and bluetooth functionality. I keep running into caompatability issues between arduino and bluetooth libraries when compiling. Ive tried nimBLE, Gamepad and Blynk so far. 
+Installing axios worked. However, it seems that hexapodControl 
+components are only available when theres a successful connection. 
+Can you modify my code so that hexapControl components  are displayed regardless? 
+For example, I want to view the slider bar before establishing a connection.
 
 
+function App() {
+  const [isWifiConnected, setWifiConnected] = useState(false);
 
+  const handleWifiConnect = (ssid, password) => {
+    // Implement logic to send Wi-Fi credentials to ESP8266
+    // Update isWifiConnected based on the connection result
+    setWifiConnected(true); // Replace with actual logic
 
-I am now able to view "crawl_forward" in the arduino ide serial monitor upon clicking
-"move_forward" button in my react app. However, my hexapod is not responding to the
-command. Upon receiving "crawl_forward" in main.js, crawlForward(); function should 
-execute and activate the servo objects within my arduino code. Below is
-a link to my github repositories
+    // For simplicity, let's assume the connection is successful
+    console.log(`Connected to Wi-Fi: ${ssid}`);
+  };
 
-https://github.com/jasonronalddavis/Hexapod-control-react-app
+  return (
+    <div className="App">
+      {!isWifiConnected ? (
+        <WifiAuthentication onConnect={handleWifiConnect} />
+      ) : (
+        <>
+          <WifiService />
+          <HexapodController />
+        </>
+      )}
+    </div>
+  );
+}
 
-https://github.com/jasonronalddavis/Arduino-Hexapod-App
+export default App;
+    
+import React, { useState } from 'react';
+import './controller.css';
+import axios from 'axios';
 
-Here is my updated esp32s code
+const HexapodController = ({ isWifiConnected }) => {
+  const [scrollValue, setScrollValue] = useState(0);
 
-#include <NimBLEDevice.h>
-#include <NimBLEUtils.h>
-#include <NimBLEServer.h>
+  const handleScroll = (e) => {
+    const value = e.target.value;
+    setScrollValue(value);
 
-BLEServer *pServer = nullptr;
-BLECharacteristic *pCharacteristic = nullptr;
-bool deviceConnected = false;
-int txValue = 0;
-
-#define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
-#define CHARACTERISTIC_UUID_RX "beb5483e-36e1-4688-b7f5-ea07361b26a8"
-
-HardwareSerial SerialBLE(2); // Use Serial2 for Bluetooth (you can choose a different UART)
-
-class MyServerCallbacks : public NimBLEServerCallbacks {
-  void onConnect(NimBLEServer *pServer) {
-    deviceConnected = true;
-    Serial.println("Device connected");
-  }
-
-  void onDisconnect(NimBLEServer *pServer) {
-    deviceConnected = false;
-    Serial.println("Device disconnected");
-  }
-};
-
-class MyCallbacks : public NimBLECharacteristicCallbacks {
-  void onWrite(NimBLECharacteristic *pCharacteristic) {
-    std::string rxValue = pCharacteristic->getValue();
-    if (rxValue.length() > 0) {
-      Serial.print("Received Value: ");
-      Serial.println(rxValue.c_str());
-      SerialBLE.println(rxValue.c_str());
+    if (isWifiConnected) {
+      // Example: Send command to ESP8266 based on the scroll value
+      // Replace "your-esp8266-ip" with your ESP8266 module's IP address
+      axios.post('http://your-esp8266-ip/control', { command: value })
+        .then(response => {
+          // Handle response if needed
+          console.log('Command sent successfully:', response.data);
+        })
+        .catch(error => {
+          // Handle error if needed
+          console.error('Error sending command:', error);
+        });
     }
-  }
+  };
+
+  return (
+    <div>
+      {isWifiConnected ? (
+        <>
+          <h2>Hexapod Controller</h2>
+          <label>
+            Scroll Value:
+            <input type="range" min="0" max="100" value={scrollValue} onChange={handleScroll} />
+          </label>
+          {/* Add other controls or display as needed */}
+        </>
+      ) : (
+        <div>
+          <h2>Wi-Fi Not Connected</h2>
+          <p>Please connect to Wi-Fi to control the hexapod.</p>
+        </div>
+      )}
+    </div>
+  );
 };
 
-void setup() {
-  Serial.begin(115200);
-  SerialBLE.begin(115200, SERIAL_8N1, 16, 17); // RX, TX pins for Serial2 on ESP32
+export default HexapodController;
+ 
 
-  NimBLEDevice::init("PEANUT");
-  pServer = NimBLEDevice::createServer();
-  pServer->setCallbacks(new MyServerCallbacks());
+ import React, { useState } from 'react';
+import axios from 'axios';
 
-  NimBLEService *pService = pServer->createService(SERVICE_UUID);
-  pCharacteristic = pService->createCharacteristic(
-      CHARACTERISTIC_UUID_RX,
-      NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::NOTIFY);
-  pCharacteristic->setCallbacks(new MyCallbacks());
+const WifiService = ({ isWifiConnected }) => {
+  const [ssid, setSSID] = useState('your-ssid'); // Replace with your actual Wi-Fi SSID
+  const [password, setPassword] = useState('your-password'); // Replace with your actual Wi-Fi password
 
-  pService->start();
-  NimBLEAdvertising *pAdvertising = pServer->getAdvertising();
-  pAdvertising->start();
-  Serial.println("Waiting for a client connection to notify...");
-}
+  const connectToWifi = () => {
+    const ssidBytes = new TextEncoder().encode(ssid);
+    const passwordBytes = new TextEncoder().encode(password);
+    const dataBytes = [...ssidBytes, 0x2C, ...passwordBytes];
 
-void loop() {
-  if (deviceConnected) {
-    // Your main code here
+    // Replace "your-esp8266-ip" with your ESP8266 module's IP address
+    const esp8266Url = 'http://your-esp8266-ip/connect';
 
-    // Example: Sending data to the client
-    pCharacteristic->setValue(String(txValue));
-    pCharacteristic->notify();
-    txValue++;
-    delay(10);
-  }
-}
+    axios.post(esp8266Url, new Uint8Array(dataBytes))
+      .then(response => {
+        console.log('Connected to Wi-Fi:', response.data);
+      })
+      .catch(error => {
+        console.error('Error connecting to Wi-Fi:', error);
+      });
+  };
+
+  return (
+    <div>
+      {isWifiConnected ? (
+        <>
+          {/* Your existing Wi-Fi service UI or controls */}
+        </>
+      ) : (
+        <div>
+          <h2>Wi-Fi Authentication</h2>
+          <label>
+            Network Name (SSID):
+            <input type="text" value={ssid} onChange={(e) => setSSID(e.target.value)} />
+          </label>
+          <br />
+          <label>
+            Password:
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          </label>
+          <br />
+          <button onClick={connectToWifi}>Connect</button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default WifiService;
+
+
+import React, { useState, useEffect } from 'react';
+import WifiService from './wifiServices.js';
+import HexapodControl from '../controls/hexapodControl.js';
+import './bluetooth control.css';
+
+const WifiController = () => {
+  const [device, setDevice] = useState(null);
+  const [connected, setConnected] = useState(false);
+  const [isMoving, setIsMoving] = useState(false);
+  const [sliderValue, setSliderValue] = useState(0);
+
+  const handleWifiConnect = async () => {
+    console.log('Handling Wi-Fi connection...');
+    try {
+      const wifiDevice = await WifiService.connect();
+      setDevice(wifiDevice);
+      setConnected(true);
+    } catch (error) {
+      console.error('Wi-Fi connection failed:', error);
+    }
+  };
+
+  const handleDisconnect = () => {
+    WifiService.disconnect();
+    setConnected(false);
+    setDevice(null);
+  };
+
+  const handleSliderChange = async (event) => {
+    const value = event.target.value;
+    setSliderValue(value);
+
+    // Assuming you want to send 'crawl_forward' or 'crawl_backward' based on the slider value
+    const command = value === '100' ? 'crawl_forward' : 'crawl_backward';
+
+    try {
+      await WifiService.sendCommandToESP(command);
+    } catch (error) {
+      console.error('Failed to send command:', error);
+    }
+  };
+
+  useEffect(() => {
+    // Effect without cleanup function
+    console.log('Component mounted');
+    
+    return () => {
+      console.log('Component unmounted');
+    };
+  }, []); // Empty dependency array means this effect runs once on mount
+
+  return (
+    <div>
+      <div className="buttons">
+        <h2 className="Hex-head">Hexapod Control</h2>
+        <h2>Status: {isMoving ? 'crawl_forward' : 'crawl-stop'}</h2>
+        <HexapodControl device={device} />
+      </div>
+      <div className="slider-container">
+        <input
+          type="range"
+          min="0"
+          max="100"
+          step="1"
+          value={sliderValue}
+          onChange={handleSliderChange}
+          className="slider"
+        />
+        <p>Slider Value: {sliderValue}</p>
+      </div>
+      <button onClick={connected ? handleDisconnect : handleWifiConnect}>
+        {connected ? 'Disconnect Wi-Fi' : 'Connect Wi-Fi'}
+      </button>
+    </div>
+  );
+};
+
+export default WifiController;

@@ -8,7 +8,7 @@ Servo eyelids;
 
 // Initialize the eye servos
 void initEyes() {
-  eyeX.attach(43);
+  eyeX.attach(41);
   eyeY.attach(44);
   eyelids.attach(45);
 }

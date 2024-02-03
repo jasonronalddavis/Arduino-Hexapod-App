@@ -7,5 +7,6 @@
 // Function declarations
 void initMouth();
 void mouthFunction();
-
+void test90();
+void test0();
 #endif
