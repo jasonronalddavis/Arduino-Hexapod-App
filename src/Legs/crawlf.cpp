@@ -4,8 +4,7 @@
 
 
 
-void myTimerEvent(); 
-// Define the leg servos
+
 
 Servo myServo2;
 Servo myServo3;
@@ -29,29 +28,31 @@ Servo myServo49;
 Servo myServo51;
 // Initialize the leg servos
 
-Servo myServos[] = {
-  Servo(), Servo(), Servo(), Servo(), Servo(),
-  Servo(), Servo(), Servo(), Servo(), Servo(),
-  Servo(), Servo(), Servo(), Servo(), Servo(),
-  Servo(), Servo(), Servo(), Servo(), Servo(),
-  Servo(), Servo(), Servo(), Servo(), Servo(),
-  Servo(), Servo(), Servo(), Servo(), Servo()
-};
 
 
-void initLegs(Servo& servo49, Servo& servo51) {
-for (size_t i = 0; i < sizeof(myServos) / sizeof(myServos[0]); i++) {
-    myServos[i].attach(2 + i);
-  }
-  myServos[18] = servo49;  // Assuming myServo49 is at index 18 in the array
-  myServos[19] = servo51;  // Assuming myServo51 is at index 20 in the array
+void initLegs() {
+ myServo2.attach(2);
+ myServo3.attach(3);
+ myServo4.attach(4);
+ myServo5.attach(5);
+ myServo6.attach(6);
+ myServo7.attach(7);
+ myServo8.attach(8);
+ myServo9.attach(9);
+ myServo10.attach(10);
+ myServo11.attach(11);
+ myServo12.attach(12);
+ myServo13.attach(13);
+ myServo14.attach(14);
+ myServo15.attach(15);
+ myServo16.attach(15);
+ myServo17.attach(17);
+ myServo18.attach(18);
+ myServo19.attach(19);
+ myServo49.attach(49);
+ myServo51.attach(51);
 }
 
-void handleServoBlynkWrite(int values[], int numServos) {
-  for (int i = 0; i < numServos; i++) {
-    myServos[i].write(values[i]);
-  }
-}
 
 // Crawl sequence 1
 void crawlOne() {
