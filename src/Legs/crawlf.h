@@ -1,5 +1,8 @@
 
 
+#ifndef CRAWLF_H
+#define CRAWLF_H
+
 #include <Arduino.h>
 #include <Servo.h>
 
@@ -16,6 +19,5 @@ void flexFunction();
 void stretch();
 void crawlForward();
 void defaultMove();
-
 
 #endif
