@@ -2,7 +2,7 @@
 #define MOUTH_H
 
 #include <Arduino.h>
-#include <Servo.h>
+#include <ESP32Servo.h>
 
 // Function declarations
 void initMouth();

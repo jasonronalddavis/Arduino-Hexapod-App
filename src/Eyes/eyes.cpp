@@ -1,5 +1,8 @@
+
+
+#include <SPI.h>
 #include <Arduino.h>
-#include <Servo.h>
+#include <ESP32Servo.h>
 
 // Define the eye servos
 Servo eyeX;

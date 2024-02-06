@@ -1,10 +1,7 @@
-
-
 #ifndef CRAWLF_H
 #define CRAWLF_H
 
 #include <Arduino.h>
-#include <Servo.h>
 
 
 // Function declarations
@@ -20,4 +17,4 @@ void stretch();
 void crawlForward();
 void defaultMove();
 
-#endif
+#endif // CRAWLF_H
