@@ -1,17 +1,16 @@
 
-
-#include <SPI.h>
-// #include <ESP32Servo.h>
+#include <ESP32Servo.h>
 #include <Arduino.h>
 #include "Eyes/eyes.h"
 #include "legs/crawlf.h"
 #include "Mouth/mouth.h"
+#include "test/test.h"
+#include "test/testlift.h"
+#include <Wire.h>
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
-#include <Adafruit_PWMServoDriver.h>
-#include <Wire.h>
 
 // Forward declaration
 void processReceivedData(const char* data);
@@ -53,19 +52,15 @@ void processReceivedData(const char* data) {
   // For example, you can use a switch statement to perform different actions based on data
   // Ensure to replace this with your desired logic
 
-  Serial.print("Received data: ");
-  Serial.println(data);
-
-  Serial.print("Is this equal to 5? ");
-  if (atoi(data) == 5)
-    Serial.println("yes");
-  else
-    Serial.println("no");
-
-  Serial.print("How much is it when multiplied by 10? ");
   int dataAsInt = atoi(data);
-  Serial.println(dataAsInt * 10);
+ 
+if (dataAsInt == 83){
+testStretch();
+}
 
+if (dataAsInt == 70){
+liftFunction();
+}
   // Add more processing logic as needed
 }
 
@@ -76,6 +71,8 @@ void setup() {
   initEyes();
   initLegs();
   initMouth();
+  initTest();
+  initLift();
   Serial1.println("Setup completed");
 
   BLEDevice::init("PEANUT");

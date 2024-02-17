@@ -1,1 +1,5 @@
-As a reminder, I am using a PCA9685 Driver to add more servos to my ESP32. What library    SoftwareI2C was a necessary component to library nachtravevl/PCA9685-Arduino@^1.2.15. What library can I use instead I had issues installing 
+15, 20, 4, 16, 17., 5, 18, 19, 21, 22, 23, 
+
+
+
+34, 35, 32, 33, 25, 26, 27, 14, 12, 13, 
