@@ -1,12 +1,12 @@
-#ifndef TESTLIFT_H
-#define TESTLIFT_H
+#ifndef LIFTTEST_H
+#define LIFTTEST_H
 
 #include <Arduino.h>
 #include <ESP32Servo.h>
 
 // Function declarations
 void initLift();
-void liftFunction();
+void testLift();
 // void testCrawlForward();
 
 //TEST LEG STRETCH

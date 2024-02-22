@@ -3,3 +3,12 @@
 
 
 34, 35, 32, 33, 25, 26, 27, 14, 12, 13, 
+
+
+
+
+
+MethodWrapper(["checkprogsize"], [".pio/build/stable/firmware.elf"])
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [==        ]  17.7% (used 57836 bytes from 327680 bytes)
+Flash: [======    ]  64.7% (used 932945 bytes from 1441792 bytes)

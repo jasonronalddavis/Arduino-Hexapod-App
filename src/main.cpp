@@ -1,11 +1,10 @@
-
 #include <ESP32Servo.h>
 #include <Arduino.h>
 #include "Eyes/eyes.h"
 #include "legs/crawlf.h"
 #include "Mouth/mouth.h"
 #include "test/test.h"
-#include "test/testlift.h"
+#include "test/lifttest.h"
 #include <Wire.h>
 #include <BLEDevice.h>
 #include <BLEServer.h>
@@ -14,6 +13,7 @@
 
 // Forward declaration
 void processReceivedData(const char* data);
+
 BLEServer* pServer = NULL;
 BLECharacteristic* pCharacteristic = NULL;
 bool deviceConnected = false;
@@ -52,14 +52,13 @@ void processReceivedData(const char* data) {
   // For example, you can use a switch statement to perform different actions based on data
   // Ensure to replace this with your desired logic
 
+
   int dataAsInt = atoi(data);
- 
 if (dataAsInt == 83){
 testStretch();
 }
-
 if (dataAsInt == 70){
-liftFunction();
+testLift();
 }
   // Add more processing logic as needed
 }
