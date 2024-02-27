@@ -3,8 +3,8 @@
 #include <Wire.h>
 #include <ESP32Servo.h>
 
-//15, 20, 4, 16, 17., 5, 18, 19, 21, 22, 23, 
-//34, 35, 32, 33, 25, 26, 27, 14, 12, 13, 
+// //15, 20, 4, 16, 17., 5, 18, 19, 21, 22, 23, 
+// //34, 35, 32, 33, 25, 26, 27, 14, 12, 13, 
 
 Servo liftTest1;
 Servo liftTest2;
@@ -25,7 +25,7 @@ Servo liftTest16;
 Servo liftTest17;
 Servo liftTest18;
 
-// Define the liftTest2 servo
+// // Define the liftTest2 servo
 void initLift() {
 liftTest1.attach(15);
 liftTest2.attach(2);

@@ -1,41 +1,34 @@
-#include <ESP32Servo.h>
+//IMPORTING MORE THAN ONE FUNCTION STOP BLE SERVER
 #include <Arduino.h>
+// SET_LOOP_TASK_STACK_SIZE( 16*1024 );    // 16KiB Stack Size
+#include <NimBLEDevice.h>
+#include <NimBLEServer.h>
+#include <NimBLEUtils.h>
+//  #include <NimBLE2902.h>
+#include <Wire.h>
+#include <ESP32Servo.h>
 #include "Eyes/eyes.h"
 #include "legs/crawlf.h"
 #include "Mouth/mouth.h"
 #include "test/test.h"
-#include "test/lifttest.h"
-#include <Wire.h>
-#include <BLEDevice.h>
-#include <BLEServer.h>
-#include <BLEUtils.h>
-#include <BLE2902.h>
+#include "test/lifttest.h" // BLUETOOTH STOPS BROADCASTING WHEN I UTILIZE
+//A FUNCTION WITHIN THIS FILE. FUNCTION initLift(); IS PLACED WITHIN SETUP 
+
+
 
 // Forward declaration
 void processReceivedData(const char* data);
 
-BLEServer* pServer = NULL;
-BLECharacteristic* pCharacteristic = NULL;
+NimBLEServer* pServer = nullptr;
+NimBLECharacteristic* pCharacteristic = nullptr;
 bool deviceConnected = false;
 int txValue = 0;
 
 #define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 #define CHARACTERISTIC_UUID_RX "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 
-class MyServerCallbacks : public BLEServerCallbacks {
-  void onConnect(BLEServer* pServer) {
-    deviceConnected = true;
-    Serial.println("Device connected");
-  }
-
-  void onDisconnect(BLEServer* pServer) {
-    deviceConnected = false;
-    Serial.println("Device disconnected");
-  }
-};
-
-class MyCallbacks : public BLECharacteristicCallbacks {
-  void onWrite(BLECharacteristic* pCharacteristic) {
+class MyCallbacks : public NimBLECharacteristicCallbacks {
+  void onWrite(NimBLECharacteristic* pCharacteristic) {
     std::string rxValue = pCharacteristic->getValue();
     if (rxValue.length() > 0) {
       Serial.print("Received Value: ");
@@ -52,42 +45,30 @@ void processReceivedData(const char* data) {
   // For example, you can use a switch statement to perform different actions based on data
   // Ensure to replace this with your desired logic
 
-
   int dataAsInt = atoi(data);
-if (dataAsInt == 83){
-testStretch();
-}
-if (dataAsInt == 70){
-testLift();
-}
+  if (dataAsInt == 83){
+    testStretch();
+  }
   // Add more processing logic as needed
 }
 
 void setup() {
+  initTest();
+  initLift(); // BLUETOOTH STOPS BROADCASTING WHEN I UTILIZE
+//A FUNCTION WITHIN THIS FILE
   Serial.begin(115200);
   Serial1.begin(115200);  // Initialize Serial1 for debugging
-
-  initEyes();
-  initLegs();
-  initMouth();
-  initTest();
-  initLift();
-  Serial1.println("Setup completed");
-
-  BLEDevice::init("PEANUT");
-  pServer = BLEDevice::createServer();
-  pServer->setCallbacks(new MyServerCallbacks());
-
-  BLEService* pService = pServer->createService(SERVICE_UUID);
+  NimBLEDevice::init("PEANUT");
+  pServer = NimBLEDevice::createServer();
+  NimBLEService* pService = pServer->createService(SERVICE_UUID);
   pCharacteristic = pService->createCharacteristic(
       CHARACTERISTIC_UUID_RX,
-      BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_NOTIFY);
+      NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::NOTIFY);
   pCharacteristic->setCallbacks(new MyCallbacks());
 
   pService->start();
-  BLEAdvertising* pAdvertising = pServer->getAdvertising();
+  NimBLEAdvertising* pAdvertising = pServer->getAdvertising();
   pAdvertising->start();
-  Serial.println("Waiting for a client connection to notify...");
 }
 
 void loop() {
