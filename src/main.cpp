@@ -11,7 +11,7 @@
 #include "legs/crawlf.h"
 #include "Mouth/mouth.h"
 #include "test/test.h"
-#include "test/lifttest.h" // BLUETOOTH STOPS BROADCASTING WHEN I UTILIZE
+// #include "test/lifttest.h" // BLUETOOTH STOPS BROADCASTING WHEN I UTILIZE
 //A FUNCTION WITHIN THIS FILE. FUNCTION initLift(); IS PLACED WITHIN SETUP 
 
 
@@ -44,18 +44,20 @@ void processReceivedData(const char* data) {
   // Implement your logic to handle the received data
   // For example, you can use a switch statement to perform different actions based on data
   // Ensure to replace this with your desired logic
-
+// initLift(); // BLUETOOTH STOPS BROADCASTING WHEN I UTILIZE
+//A FUNCTION WITHIN THIS FILE
   int dataAsInt = atoi(data);
   if (dataAsInt == 83){
     testStretch();
   }
-  // Add more processing logic as needed
+  // if (dataAsInt == 70){
+  //   testLift();
+  // }
 }
 
 void setup() {
   initTest();
-  initLift(); // BLUETOOTH STOPS BROADCASTING WHEN I UTILIZE
-//A FUNCTION WITHIN THIS FILE
+
   Serial.begin(115200);
   Serial1.begin(115200);  // Initialize Serial1 for debugging
   NimBLEDevice::init("PEANUT");

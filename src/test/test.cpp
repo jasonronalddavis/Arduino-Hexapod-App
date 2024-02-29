@@ -26,25 +26,25 @@ Servo test18;
 
 // Define the test2 servo
 void initTest() {
-test1.attach(15);
-test2.attach(2);
-test3.attach(21);
-test4.attach(4);
-test5.attach(16);
-test6.attach(17);
-test7.attach(5);
-test8.attach(18);
-test9.attach(19);
+test1.attach(14);
+test2.attach(13);
+test3.attach(12);
+test4.attach(11);
+test5.attach(10);
+test6.attach(9);
+test7.attach(46);
+test8.attach(3);
+test9.attach(8);
 
-test10.attach(13);
-test11.attach(12);
-test12.attach(14);
-test13.attach(27);
-test14.attach(26);
-test15.attach(25);
-test16.attach(33);
-test17.attach(32);
-test18.attach(35);
+test10.attach(19);
+test11.attach(20);
+test12.attach(21);
+test13.attach(47);
+test14.attach(48);
+test15.attach(45);
+test16.attach(35);
+test17.attach(36);
+test18.attach(37);
 }
 
  void testStretch(){
