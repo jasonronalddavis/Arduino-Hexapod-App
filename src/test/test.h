@@ -2,17 +2,17 @@
 #define TEST_H
 
 #include <Arduino.h>
-#include <ESP32Servo.h>
+#include <Adafruit_PWMServoDriver.h>
 
-// Function declarations
-void initTest();
+// #define SERVO_COUNT_ESP32 18 // Number of servos attached to ESP32
+
+extern Adafruit_PWMServoDriver board1; // Declare the PCA9685 object for board 1
+extern Adafruit_PWMServoDriver board2; // Declare the PCA9685 object for board 1
+
+void initPca();
+// void attachAndSetAngle(Servo &servo, int pin, int angle);
+int angleToPulse(int ang);
 void testStretch();
-// void testCrawlForward();
-
-//TEST LEG STRETCH
-// void testCrawlOne();
-// void testCrawlTwo();
-// void testCrawlThree();
-// void testCrawlFour();
+void testLift();
 
 #endif

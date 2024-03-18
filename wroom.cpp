@@ -1,115 +1,93 @@
 #include <Arduino.h>
-#include <Wire.h>
+// #include <Wire.h>
 #include <ESP32Servo.h>
-#include <Adafruit_PWMServoDriver.h>
+// #include <Adafruit_PWMServoDriver.h>
 
 #define SERVO_COUNT_ESP32 18 // Number of servos attached to ESP32
 
-// Servo servos_ESP32[SERVO_COUNT_ESP32]; // Array to hold ESP32 servo objects
-Adafruit_PWMServoDriver board1 = Adafruit_PWMServoDriver(0x40); // Initialize the PCA9685 object for board 1
-Adafruit_PWMServoDriver board2 = Adafruit_PWMServoDriver(0x41); // Initialize the PCA9685 object for board 2
-
-void initPca(){
- board1.begin(); // Begin communication with board 1
-  board1.setPWMFreq(60); // Set PWM frequency to 60Hz
+Servo servos_ESP32[SERVO_COUNT_ESP32]; // Array to hold ESP32 servo objects
 
 
-   board2.begin(); // Begin communication with board 1
-  board2.setPWMFreq(60); // Set PWM frequency to 60Hz
-}
-
-// void attachAndSetAngle(Servo &servo, int pin, int angle) {
-//   servo.attach(pin); // Attach servo to pin
-//   servo.write(angle); // Set initial angle
-// }
-
-
-int angleToPulse(int ang) {
-  int SERVOMIN = 125; // Minimum pulse length count
-  int SERVOMAX = 575; // Maximum pulse length count
-  int pulse = map(ang, 0, 180, SERVOMIN, SERVOMAX); // Map angle to pulse width
-  Serial.print("Angle: "); Serial.print(ang);
-  Serial.print(" pulse: "); Serial.println(pulse);
-  return pulse;
-}
-
-void testStretch(){
-    for (int servoNum = 0; servoNum < 18; servoNum++) {
-        board1.setPWM(servoNum + 1, 0, angleToPulse(90)); // Set servo to 90 degrees on board 1
-        board2.setPWM(servoNum + 1, 0, angleToPulse(90)); // Set servo to 90 degrees on board 2
-    }
+void attachAndSetAngle(Servo &servo, int pin, int angle) {
+  servo.attach(pin); // Attach servo to pin
+  servo.write(angle); // Set initial angle
 }
 
 
-
-
+void testStretch() {
+  // Move all ESP32 servos to 90 degrees
+  for (int i = 0; i < SERVO_COUNT_ESP32; i++) {
+    attachAndSetAngle(servos_ESP32[i], i, 90);
+  }
+}
 
 
 void testLift() {
   // LIMB 1 SEG 1 (Hip)
-  board1.setPWM(1, 0, angleToPulse(90));
+  attachAndSetAngle(servos_ESP32[0], 19, 90);
 
   // LIMB 1 SEG 2 (Knee)
-  board1.setPWM(2, 0, angleToPulse(135));
+  attachAndSetAngle(servos_ESP32[1], 20, 135);
 
   // LIMB 1 SEG 3 (Ankle)
-  board1.setPWM(3, 0, angleToPulse(125));
+  attachAndSetAngle(servos_ESP32[2], 21, 125);
 
 
 
   // LIMB 2 SEG 1 (Hip)
-  board1.setPWM(4, 0, angleToPulse(90));
+  attachAndSetAngle(servos_ESP32[3], 47, 90);
 
   // LIMB 2 SEG 2 (Knee)
-  board1.setPWM(5, 0, angleToPulse(135));
+  attachAndSetAngle(servos_ESP32[4], 48, 135);
 
   // LIMB 2 SEG 3 (Ankle)
-  board1.setPWM(6, 0, angleToPulse(125));
+  attachAndSetAngle(servos_ESP32[5], 45, 125);
 
 
 
 
   // LIMB 3 SEG 1 (Hip)
-  board1.setPWM(7, 0, angleToPulse(90));
+  attachAndSetAngle(servos_ESP32[6], 41, 90);
 
   // LIMB 3 SEG 2 (Knee)
-  board1.setPWM(8, 0, angleToPulse(135));
+  attachAndSetAngle(servos_ESP32[7], 42, 135);
 
   // LIMB 3 SEG 3 (Ankle)
-  board1.setPWM(9, 0, angleToPulse(125));
+  attachAndSetAngle(servos_ESP32[8], 2, 125);
 
 
 
   // LIMB 4 SEG 1 (Hip)
-  board2.setPWM(1, 0, angleToPulse(90));
+  attachAndSetAngle(servos_ESP32[9], 4, 90);
 
   // LIMB 4 SEG 2 (Knee)
-  board2.setPWM(2, 0, angleToPulse(135));
+  attachAndSetAngle(servos_ESP32[10], 5, 135);
 
   // LIMB 4 SEG 3 (Ankle)
-  board2.setPWM(3, 0, angleToPulse(125));
+  attachAndSetAngle(servos_ESP32[11], 6, 125);
 
 
 
   // LIMB 5 SEG 1 (Hip)
-  board2.setPWM(4, 0, angleToPulse(90));
+  attachAndSetAngle(servos_ESP32[12], 16, 90);
 
   // LIMB 5 SEG 2 (Knee)
-  board2.setPWM(5, 0, angleToPulse(135));
+  attachAndSetAngle(servos_ESP32[13], 17, 135);
 
   // LIMB 5 SEG 3 (Ankle)
-  board2.setPWM(6, 0, angleToPulse(125));
+  attachAndSetAngle(servos_ESP32[14], 18, 125);
 
 
 
-    // LIMB 5 SEG 1 (Hip)
-  board2.setPWM(7, 0, angleToPulse(90));
+  // LIMB 5 SEG 1 (Hip)
+  attachAndSetAngle(servos_ESP32[15], 12, 90);
 
   // LIMB 5 SEG 2 (Knee)
-  board2.setPWM(8, 0, angleToPulse(135));
+  attachAndSetAngle(servos_ESP32[16], 13, 135);
 
   // LIMB 5 SEG 3 (Ankle)
-  board2.setPWM(9, 0, angleToPulse(125));
+  attachAndSetAngle(servos_ESP32[17], 14, 125);
+
 }
 
 

@@ -269,3 +269,230 @@
 // }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#include <Arduino.h>
+#include <Wire.h>
+#include <ESP32Servo.h>
+
+// Define the maximum number of servos
+#define MAX_NUM_SERVOS 18
+
+// Define the maximum number of segments per limb
+#define NUM_SEGMENTS_PER_LIMB 3
+
+// Define the servo pins
+const int servoPins[MAX_NUM_SERVOS] = {14, 13, 18, 11, 10, 9, 46, 3, 8, 19, 20, 21, 47, 48, 45, 35, 36, 37};
+
+Servo servos[MAX_NUM_SERVOS];
+
+// Function to initialize the servos and set initial positions
+void initTest() {
+  for (int i = 0; i < MAX_NUM_SERVOS; i++) {
+    servos[i].attach(servoPins[i]);
+    // Set initial position to 90 degrees
+    servos[i].write(90);
+  }
+}
+
+
+// void testCrawlOne() {
+//   // LIMB 1 SEG 1
+//   test1.write(90);
+//   // LIMB 1 SEG 2
+//   test2.write(130);
+//   // LIMB 1 SEG 3
+//   test3.write(135);
+
+//   // LIMB 2 SEG 1
+//   test4.write(90);
+//   // LIMB 2 SEG 2
+//   test5.write(60);
+//   // LIMB 2 SEG 3
+//   test6.write(125);
+
+//   // LIMB 3 SEG 1
+//   test7.write(90);
+//   // LIMB 3 SEG 2
+//   test8.write(120);
+//   // LIMB 3 SEG 3
+//   test9.write(120);
+
+//   // LIMB 4 SEG 1
+//   test10.write(90);
+//   // LIMB 4 SEG 2
+//   test11.write(60);
+//   // LIMB 4 SEG 3
+//   test12.write(130);
+
+//   // LIMB 5 SEG 1
+//   test13.write(90);
+//   // LIMB 5 SEG 2
+//   test14.write(120);
+//   // LIMB 5 SEG 3
+//   test15.write(120);
+
+//   // LIMB 6 SEG 1
+//   test16.write(90);
+//   // LIMB 6 SEG 2
+//   test17.write(60);
+//   // LIMB 6 SEG 3
+//   test18.write(120);
+// }
+
+
+
+
+// void testCrawlTwo(){
+// //LIMB 1 SEG 1
+// test1.write(65);
+// //LIMB 1 SEG 2
+// test2.write(60);
+// //LIMB 1 SEG 3
+// test3.write(120);
+
+// //LIMB 2 SEG 1
+// test4.write(115);
+// //LIMB 2 SEG 2
+// test5.write(65);
+// //LIMB 2 SEG 3
+// test6.write(130);
+
+// //LIMB 3 SEG 1
+// test7.write(70);
+// //LIMB 3 SEG 2
+// test8.write(60);
+// //LIMB 3 SEG 3
+// test9.write(135);
+
+// //LIMB 4 SEG 1
+// test10.write(90);
+// //LIMB 4 SEG 2
+// test11.write(65);
+// //LIMB 4 SEG 3
+// test12.write(125);
+
+// //LIMB 5 SEG 1
+// test13.write(110);
+// //LIMB 5 SEG 2
+// test14.write(110);
+// //LIMB 5 SEG 3
+// test15.write(130);
+
+// //LIMB 6 SEG 1
+// test16.write(80);
+// //LIMB 6 SEG 2
+// test17.write(60);
+// //LIMB 6 SEG 3
+// test18.write(130);
+// }
+
+// void testCrawlThree(){
+// //LIMB 1 SEG 1
+// test1.write(90);
+// //LIMB 1 SEG 2
+// test2.write(60);
+// //LIMB 1 SEG 3
+// test3.write(125);
+
+// //LIMB 2 SEG 1
+// test4.write(90);
+// //LIMB 2 SEG 2
+// test5.write(120);
+// //LIMB 2 SEG 3
+// test6.write(125);
+
+// //LIMB 3 SEG 1
+// test7.write(90);
+// //LIMB 3 SEG 2
+// test8.write(60);
+// //LIMB 3 SEG 3
+// test9.write(130);
+
+// //LIMB 4 SEG 1
+// test10.write(90);
+// //LIMB 4 SEG 2
+// test11.write(120);
+// //LIMB 4 SEG 3
+// test12.write(120);
+
+// //LIMB 5 SEG 1
+// test13.write(90);
+// //LIMB 5 SEG 2
+// test14.write(65);
+// //LIMB 5 SEG 3
+// test15.write(130);
+
+// //LIMB 6 SEG 1
+// test16.write(90);
+// //LIMB 6 SEG 2
+// test17.write(130);
+// //LIMB 6 SEG 3
+// test18.write(130);
+// }
+
+// void testCrawlFour(){
+// //LIMB 1 SEG 1
+// test1.write(105);
+// //LIMB 1 SEG 2
+// test2.write(60);
+// //LIMB 1 SEG 3
+// test3.write(135);
+
+// //LIMB 2 SEG 1
+// test4.write(80);
+// //LIMB 2 SEG 2
+// test5.write(65);
+// //LIMB 2 SEG 3
+// test6.write(120);
+
+// //LIMB 3 SEG 1
+// test7.write(100);
+// //LIMB 3 SEG 2
+// test8.write(65);
+// //LIMB 3 SEG 3
+// test9.write(115);
+
+// //LIMB 4 SEG 1
+// test10.write(95);
+// //LIMB 4 SEG 2
+// test11.write(65);
+// //LIMB 4 SEG 3
+// test12.write(130);
+
+// //LIMB 5 SEG 1
+// test13.write(70);
+// //LIMB 5 SEG 2
+// test14.write(70);
+// //LIMB 5 SEG 3
+// test15.write(125);
+
+// //LIMB 6 SEG 1
+// test16.write(100);
+// //LIMB 6 SEG 2
+// test17.write(60);
+// //LIMB 6 SEG 3
+// test18.write(120);
+
+// }
+
+
+// void testCrawlForward() {
+// testCrawlOne();
+// testCrawlTwo();
+// testCrawlThree();
+// testCrawlFour();
+// }

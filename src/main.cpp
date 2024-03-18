@@ -1,28 +1,21 @@
-//IMPORTING MORE THAN ONE FUNCTION STOP BLE SERVER
 #include <Arduino.h>
-// SET_LOOP_TASK_STACK_SIZE( 16*1024 );    // 16KiB Stack Size
 #include <NimBLEDevice.h>
 #include <NimBLEServer.h>
 #include <NimBLEUtils.h>
-//  #include <NimBLE2902.h>
 #include <Wire.h>
 #include <ESP32Servo.h>
 #include "Eyes/eyes.h"
 #include "legs/crawlf.h"
 #include "Mouth/mouth.h"
 #include "test/test.h"
-// #include "test/lifttest.h" // BLUETOOTH STOPS BROADCASTING WHEN I UTILIZE
-//A FUNCTION WITHIN THIS FILE. FUNCTION initLift(); IS PLACED WITHIN SETUP 
+#include <Adafruit_PWMServoDriver.h>
 
-
-
-// Forward declaration
-void processReceivedData(const char* data);
 
 NimBLEServer* pServer = nullptr;
 NimBLECharacteristic* pCharacteristic = nullptr;
 bool deviceConnected = false;
-int txValue = 0;
+
+void processReceivedData(const char* data);
 
 #define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 #define CHARACTERISTIC_UUID_RX "beb5483e-36e1-4688-b7f5-ea07361b26a8"
@@ -41,25 +34,21 @@ class MyCallbacks : public NimBLECharacteristicCallbacks {
 };
 
 void processReceivedData(const char* data) {
-  // Implement your logic to handle the received data
-  // For example, you can use a switch statement to perform different actions based on data
-  // Ensure to replace this with your desired logic
-// initLift(); // BLUETOOTH STOPS BROADCASTING WHEN I UTILIZE
-//A FUNCTION WITHIN THIS FILE
   int dataAsInt = atoi(data);
-  if (dataAsInt == 83){
-    testStretch();
+  if (dataAsInt == 83) {
+      Serial.println("test"); //if dataAsInt == 83, if servoInitialized is truthy, Serial.println("test"); and testStretch();
+      testStretch(); // Call testStretch() if data is 83 and servos are initialized
   }
-  // if (dataAsInt == 70){
-  //   testLift();
-  // }
+  if (dataAsInt == 70) {    
+       Serial.println("lift");
+       testLift();
+}
 }
 
-void setup() {
-  initTest();
 
+void setup() {
   Serial.begin(115200);
-  Serial1.begin(115200);  // Initialize Serial1 for debugging
+  Serial1.begin(115200);
   NimBLEDevice::init("PEANUT");
   pServer = NimBLEDevice::createServer();
   NimBLEService* pService = pServer->createService(SERVICE_UUID);
@@ -71,26 +60,15 @@ void setup() {
   pService->start();
   NimBLEAdvertising* pAdvertising = pServer->getAdvertising();
   pAdvertising->start();
+  
+  // Attach servo motors to serial pins
+  initPca();
 }
 
 void loop() {
-  // Process Bluetooth data if available
   while (Serial1.available()) {
     String receivedData = Serial1.readStringUntil('\n');
-    
-    // Print the received data
     Serial1.println(receivedData);
-
-    // Process the received data
     processReceivedData(receivedData.c_str());
   }
-
-  if (deviceConnected) {
-    // Send data to ESP32 if needed
-    pCharacteristic->setValue("Hello from ESP32");
-    pCharacteristic->notify();
-    delay(1000);
-  }
-
-  // Your other loop logic here
 }
