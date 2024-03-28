@@ -1,3 +1,4 @@
+//main.cpp
 #include <Arduino.h>
 #include <NimBLEDevice.h>
 #include <NimBLEServer.h>
@@ -9,11 +10,13 @@
 #include "Mouth/mouth.h"
 #include "test/test.h"
 #include <Adafruit_PWMServoDriver.h>
+#include <SPI.h>
 
 
 NimBLEServer* pServer = nullptr;
 NimBLECharacteristic* pCharacteristic = nullptr;
 bool deviceConnected = false;
+
 
 void processReceivedData(const char* data);
 
@@ -31,18 +34,30 @@ class MyCallbacks : public NimBLECharacteristicCallbacks {
       processReceivedData(rxValue.c_str());
     }
   }
+   void onConnect(NimBLEServer* pServer) {
+    Serial.println("Connected!");
+    Serial1.println("success");
+  }
+  void onDisconnect(NimBLEServer* pServer) {
+    Serial.println("Disconnected!");
+  }
 };
 
 void processReceivedData(const char* data) {
   int dataAsInt = atoi(data);
   if (dataAsInt == 83) {
-      Serial.println("test"); //if dataAsInt == 83, if servoInitialized is truthy, Serial.println("test"); and testStretch();
-      testStretch(); // Call testStretch() if data is 83 and servos are initialized
+      Serial.println("Stretching..."); 
+      testStretch();
   }
-  if (dataAsInt == 70) {    
-       Serial.println("lift");
-       testLift();
-}
+  if (dataAsInt == 18) {    
+       Serial.println("Lifting and Standing..."); 
+      testLift();
+  }
+    if (dataAsInt == 13) {    
+       Serial.println("Lifting and Standing..."); 
+      testStand();
+  }
+ 
 }
 
 
@@ -60,14 +75,13 @@ void setup() {
   pService->start();
   NimBLEAdvertising* pAdvertising = pServer->getAdvertising();
   pAdvertising->start();
-  
-  // Attach servo motors to serial pins
-  initPca();
+  initTest();
 }
 
 void loop() {
   while (Serial1.available()) {
     String receivedData = Serial1.readStringUntil('\n');
+    Serial.println("Barnes!");
     Serial1.println(receivedData);
     processReceivedData(receivedData.c_str());
   }

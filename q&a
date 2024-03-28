@@ -1,14 +1,100 @@
-15, 20, 4, 16, 17., 5, 18, 19, 21, 22, 23, 
+//I am now able to successully control all servos with my react app
+// My next step is to implement a crawling motion for my hexapod via bluetooth.
+// I would like crawForward(); to continuosly loop while crawlf == true. Holding down
+// the "Crawl Forward" button on my react app sends byte 11. On main.cpp, if byte 11 is received,
+// then crawlf = true. Upon releasing the Crawl Forward button in react, byte 14 is transmitted.
+// If byte 14 is received, then Crawl Forward = false. Can you modify hexapodControl component, main.cpp,
+// and/or test.cpp if necessary?
+
+
+//main.cpp
+#include <Arduino.h>
+#include <NimBLEDevice.h>
+#include <NimBLEServer.h>
+#include <NimBLEUtils.h>
+#include <Wire.h>
+#include <ESP32Servo.h>
+#include "Eyes/eyes.h"
+#include "legs/crawlf.h"
+#include "Mouth/mouth.h"
+#include "test/test.h"
+#include <Adafruit_PWMServoDriver.h>
+#include <SPI.h>
+
+
+NimBLEServer* pServer = nullptr;
+NimBLECharacteristic* pCharacteristic = nullptr;
+bool deviceConnected = false;
+
+
+void processReceivedData(const char* data);
+
+#define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
+#define CHARACTERISTIC_UUID_RX "beb5483e-36e1-4688-b7f5-ea07361b26a8"
+
+class MyCallbacks : public NimBLECharacteristicCallbacks {
+  void onWrite(NimBLECharacteristic* pCharacteristic) {
+    std::string rxValue = pCharacteristic->getValue();
+    if (rxValue.length() > 0) {
+      Serial.print("Received Value: ");
+      Serial.println(rxValue.c_str());
+
+      // Process the received data
+      processReceivedData(rxValue.c_str());
+    }
+  }
+   void onConnect(NimBLEServer* pServer) {
+    Serial.println("Connected!");
+    Serial1.println("success");
+  }
+  void onDisconnect(NimBLEServer* pServer) {
+    Serial.println("Disconnected!");
+  }
+};
+
+void processReceivedData(const char* data) {
+  int dataAsInt = atoi(data);
+  if (dataAsInt == 83) {
+      Serial.println("Stretching..."); 
+      testStretch();
+  }
+  if (dataAsInt == 18) {    
+       Serial.println("Lifting and Standing..."); 
+      testLift();
+  }
+    if (dataAsInt == 13) {    
+       Serial.println("Lifting and Standing..."); 
+      testStand();
+  }
+ 
+}
+
+
+void setup() {
+  Serial.begin(115200);
+  Serial1.begin(115200);
+  NimBLEDevice::init("PEANUT");
+  pServer = NimBLEDevice::createServer();
+  NimBLEService* pService = pServer->createService(SERVICE_UUID);
+  pCharacteristic = pService->createCharacteristic(
+      CHARACTERISTIC_UUID_RX,
+      NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::NOTIFY);
+  pCharacteristic->setCallbacks(new MyCallbacks());
+
+  pService->start();
+  NimBLEAdvertising* pAdvertising = pServer->getAdvertising();
+  pAdvertising->start();
+  initTest();
+}
+
+void loop() {
+  while (Serial1.available()) {
+    String receivedData = Serial1.readStringUntil('\n');
+    Serial.println("Barnes!");
+    Serial1.println(receivedData);
+    processReceivedData(receivedData.c_str());
+  }
+}
 
 
 
-34, 35, 32, 33, 25, 26, 27, 14, 12, 13, 
-
-
-
-
-
-MethodWrapper(["checkprogsize"], [".pio/build/stable/firmware.elf"])
-Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
-RAM:   [==        ]  17.7% (used 57836 bytes from 327680 bytes)
-Flash: [======    ]  64.7% (used 932945 bytes from 1441792 bytes)

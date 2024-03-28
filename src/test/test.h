@@ -9,10 +9,10 @@
 extern Adafruit_PWMServoDriver board1; // Declare the PCA9685 object for board 1
 extern Adafruit_PWMServoDriver board2; // Declare the PCA9685 object for board 1
 
-void initPca();
+void initTest();
 // void attachAndSetAngle(Servo &servo, int pin, int angle);
 int angleToPulse(int ang);
 void testStretch();
 void testLift();
-
+void testStand();
 #endif

@@ -2,10 +2,17 @@
 #define EYES_H
 
 #include <Arduino.h>
-// #include <Servo.h>
+#include <Adafruit_PWMServoDriver.h>
 
-// Function declarations
+extern Adafruit_PWMServoDriver eBoard;
+
 void initEyes();
-void eyeFunction();
+int eyePulse(int ang);
+int blinkPulse(int ang);
+void moveEyeballX(int angle);
+void moveEyeballY(int angle);
+void eyelid(int angle);
+void blinkDown();
+void blinkUp();
 
-#endif
+#endif /* EYES_H */
