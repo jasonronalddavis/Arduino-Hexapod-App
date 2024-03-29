@@ -16,6 +16,7 @@
 NimBLEServer* pServer = nullptr;
 NimBLECharacteristic* pCharacteristic = nullptr;
 bool deviceConnected = false;
+bool crawlf = false; // Variable to track crawling motion
 
 
 void processReceivedData(const char* data);
@@ -46,20 +47,22 @@ class MyCallbacks : public NimBLECharacteristicCallbacks {
 void processReceivedData(const char* data) {
   int dataAsInt = atoi(data);
   if (dataAsInt == 83) {
-      Serial.println("Stretching..."); 
-      testStretch();
+    Serial.println("Stretching..."); 
+    testStretch();
   }
-  if (dataAsInt == 18) {    
-       Serial.println("Lifting and Standing..."); 
-      testLift();
+  else if (dataAsInt == 18) {    
+    Serial.println("Lifting and Standing..."); 
+    testLift();
   }
-    if (dataAsInt == 13) {    
-       Serial.println("Lifting and Standing..."); 
-      testStand();
+    else if (dataAsInt == 13) {    
+    Serial.println("Lifting and Standing..."); 
+    testStand();
   }
- 
+  else if (dataAsInt == 11) {    
+    Serial.println("Crawling forward..."); 
+  crawlf == true;
+  }
 }
-
 
 void setup() {
   Serial.begin(115200);
@@ -71,7 +74,6 @@ void setup() {
       CHARACTERISTIC_UUID_RX,
       NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::NOTIFY);
   pCharacteristic->setCallbacks(new MyCallbacks());
-
   pService->start();
   NimBLEAdvertising* pAdvertising = pServer->getAdvertising();
   pAdvertising->start();
@@ -84,5 +86,12 @@ void loop() {
     Serial.println("Barnes!");
     Serial1.println(receivedData);
     processReceivedData(receivedData.c_str());
-  }
+    // If crawlForward is true, continuously call the crawlForward function
+
+}
+
+if (crawlf == true){
+crawlForward();
+}
+
 }

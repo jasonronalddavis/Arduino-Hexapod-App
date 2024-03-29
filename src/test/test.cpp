@@ -1,3 +1,4 @@
+//test.cpp
 #include <Arduino.h>
 #include <Wire.h>
 #include <ESP32Servo.h>
@@ -17,7 +18,6 @@ void initTest(){
    board2.begin(); // Begin communication with board 1
   board2.setPWMFreq(60); // Set PWM frequency to 60Hz
 }
-
 
 int angleToPulse(int ang) {
   int SERVOMIN = 125; // Minimum pulse length count
@@ -39,60 +39,43 @@ void testStretch(){
 void testLift() {
   // LIMB 1 SEG 1 (Hip)
   board1.setPWM(1, 0, angleToPulse(90));
-
   // LIMB 1 SEG 2 (Knee)
   board1.setPWM(2, 0, angleToPulse(150));
-
   // LIMB 1 SEG 3 (Ankle)
   board1.setPWM(3, 0, angleToPulse(125));
 
-
   // LIMB 2 SEG 1 (Hip)
   board1.setPWM(4, 0, angleToPulse(90));
-
   // LIMB 2 SEG 2 (Knee)
   board1.setPWM(5, 0, angleToPulse(150));
-
   // LIMB 2 SEG 3 (Ankle)
   board1.setPWM(6, 0, angleToPulse(125));
 
-
   // LIMB 3 SEG 1 (Hip)
   board1.setPWM(7, 0, angleToPulse(90));
-
   // LIMB 3 SEG 2 (Knee)
   board1.setPWM(8, 0, angleToPulse(150));
-
   // LIMB 3 SEG 3 (Ankle)
   board1.setPWM(9, 0, angleToPulse(125));
 
-
   // LIMB 4 SEG 1 (Hip)
   board2.setPWM(1, 0, angleToPulse(90));
-
   // LIMB 4 SEG 2 (Knee)
   board2.setPWM(2, 0, angleToPulse(150));
-
   // LIMB 4 SEG 3 (Ankle)
   board2.setPWM(3, 0, angleToPulse(125));
 
-
   // LIMB 5 SEG 1 (Hip)
   board2.setPWM(4, 0, angleToPulse(90));
-
   // LIMB 5 SEG 2 (Knee)
   board2.setPWM(5, 0, angleToPulse(150));
-
   // LIMB 5 SEG 3 (Ankle)
   board2.setPWM(6, 0, angleToPulse(125));
 
-
     // LIMB 5 SEG 1 (Hip)
   board2.setPWM(7, 0, angleToPulse(90));
-
   // LIMB 5 SEG 2 (Knee)
   board2.setPWM(8, 0, angleToPulse(150));
-
   // LIMB 5 SEG 3 (Ankle)
   board2.setPWM(9, 0, angleToPulse(125));
 }
@@ -102,66 +85,43 @@ void testLift() {
  void testStand() {
   // LIMB 1 SEG 1 (Hip)
   board1.setPWM(1, 0, angleToPulse(90));
-
   // LIMB 1 SEG 2 (Knee)
   board1.setPWM(2, 0, angleToPulse(60));
-
   // LIMB 1 SEG 3 (Ankle)
   board1.setPWM(3, 0, angleToPulse(150));
 
-
-
   // LIMB 2 SEG 1 (Hip)
   board1.setPWM(4, 0, angleToPulse(90));
-
   // LIMB 2 SEG 2 (Knee)
   board1.setPWM(5, 0, angleToPulse(60));
-
   // LIMB 2 SEG 3 (Ankle)
   board1.setPWM(6, 0, angleToPulse(150));
 
-
-
-
   // LIMB 3 SEG 1 (Hip)
   board1.setPWM(7, 0, angleToPulse(90));
-
   // LIMB 3 SEG 2 (Knee)
   board1.setPWM(8, 0, angleToPulse(60));
-
   // LIMB 3 SEG 3 (Ankle)
   board1.setPWM(9, 0, angleToPulse(150));
 
-
-
   // LIMB 4 SEG 1 (Hip)
   board2.setPWM(1, 0, angleToPulse(90));
-
   // LIMB 4 SEG 2 (Knee)
   board2.setPWM(2, 0, angleToPulse(60));
-
   // LIMB 4 SEG 3 (Ankle)
   board2.setPWM(3, 0, angleToPulse(150));
 
-
-
   // LIMB 5 SEG 1 (Hip)
   board2.setPWM(4, 0, angleToPulse(90));
-
   // LIMB 5 SEG 2 (Knee)
   board2.setPWM(5, 0, angleToPulse(60));
-
   // LIMB 5 SEG 3 (Ankle)
   board2.setPWM(6, 0, angleToPulse(150));
 
-
-
     // LIMB 5 SEG 1 (Hip)
   board2.setPWM(7, 0, angleToPulse(90));
-
   // LIMB 5 SEG 2 (Knee)
   board2.setPWM(8, 0, angleToPulse(60));
-
   // LIMB 5 SEG 3 (Ankle)
   board2.setPWM(9, 0, angleToPulse(150));
 }
@@ -169,189 +129,187 @@ void testLift() {
 
 
 
-// void testCrawlOne() {
-//   // LIMB 1 SEG 1
-//    board1.setPWM(1, 0, angleToPulse(90));
-//   // LIMB 1 SEG 2
-//   board1.setPWM(2, 0, angleToPulse(130));
-//   // LIMB 1 SEG 3
-//   board1.setPWM(3, 0, angleToPulse(135));
+void testCrawlOne() {
+  // LIMB 1 SEG 1
+   board1.setPWM(1, 0, angleToPulse(90));
+  // LIMB 1 SEG 2
+  board1.setPWM(2, 0, angleToPulse(130));
+  // LIMB 1 SEG 3
+  board1.setPWM(3, 0, angleToPulse(135));
 
-//   // LIMB 2 SEG 1
-//    board1.setPWM(4, 0, angleToPulse(90));
-//   // LIMB 2 SEG 2
-//    board1.setPWM(5, 0, angleToPulse(60));
-//   // LIMB 2 SEG 3
-//    board1.setPWM(6, 0, angleToPulse(125));
+  // LIMB 2 SEG 1
+   board1.setPWM(4, 0, angleToPulse(90));
+  // LIMB 2 SEG 2
+   board1.setPWM(5, 0, angleToPulse(60));
+  // LIMB 2 SEG 3
+   board1.setPWM(6, 0, angleToPulse(125));
 
-//   // LIMB 3 SEG 1
-//    board1.setPWM(7, 0, angleToPulse(90));
-//   // LIMB 3 SEG 2
-//    board1.setPWM(8, 0, angleToPulse(120));
-//   // LIMB 3 SEG 3
-//    board1.setPWM(9, 0, angleToPulse(120));
+  // LIMB 3 SEG 1
+   board1.setPWM(7, 0, angleToPulse(90));
+  // LIMB 3 SEG 2
+   board1.setPWM(8, 0, angleToPulse(120));
+  // LIMB 3 SEG 3
+   board1.setPWM(9, 0, angleToPulse(120));
 
-//   // LIMB 4 SEG 1
-//    board2.setPWM(1, 0, angleToPulse(90));
-//   // LIMB 4 SEG 2
-//    board2.setPWM(2, 0, angleToPulse(60));
-//   // LIMB 4 SEG 3
-//    board2.setPWM(3, 0, angleToPulse(130));
+  // LIMB 4 SEG 1
+   board2.setPWM(1, 0, angleToPulse(90));
+  // LIMB 4 SEG 2
+   board2.setPWM(2, 0, angleToPulse(60));
+  // LIMB 4 SEG 3
+   board2.setPWM(3, 0, angleToPulse(130));
 
-//   // LIMB 5 SEG 1
-//    board2.setPWM(4, 0, angleToPulse(90));
-//   // LIMB 5 SEG 2
-//    board2.setPWM(5, 0, angleToPulse(120));
-//   // LIMB 5 SEG 3
-//    board2.setPWM(6, 0, angleToPulse(120));
+  // LIMB 5 SEG 1
+   board2.setPWM(4, 0, angleToPulse(90));
+  // LIMB 5 SEG 2
+   board2.setPWM(5, 0, angleToPulse(120));
+  // LIMB 5 SEG 3
+   board2.setPWM(6, 0, angleToPulse(120));
 
-//   // LIMB 6 SEG 1
-//    board2.setPWM(7, 0, angleToPulse(90));
-//   // LIMB 6 SEG 2
-//    board2.setPWM(8, 0, angleToPulse(60));
-//   // LIMB 6 SEG 3
-//    board2.setPWM(9, 0, angleToPulse(120));
-// }
-
-
+  // LIMB 6 SEG 1
+   board2.setPWM(7, 0, angleToPulse(90));
+  // LIMB 6 SEG 2
+   board2.setPWM(8, 0, angleToPulse(60));
+  // LIMB 6 SEG 3
+   board2.setPWM(9, 0, angleToPulse(120));
+}
 
 
-// void testCrawlTwo(){
-// //LIMB 1 SEG 1
-// board1.setPWM(1, 0, angleToPulse(65));
-// //LIMB 1 SEG 2
-// board1.setPWM(2, 0, angleToPulse(60));
-// //LIMB 1 SEG 3
-// board1.setPWM(3, 0, angleToPulse(120));
+void testCrawlTwo(){
+//LIMB 1 SEG 1
+board1.setPWM(1, 0, angleToPulse(65));
+//LIMB 1 SEG 2
+board1.setPWM(2, 0, angleToPulse(60));
+//LIMB 1 SEG 3
+board1.setPWM(3, 0, angleToPulse(120));
 
-// //LIMB 2 SEG 1
-// test4.write(115);
-// //LIMB 2 SEG 2
-// test5.write(65);
-// //LIMB 2 SEG 3
-// test6.write(130);
+//LIMB 2 SEG 1
+board1.setPWM(4, 0, angleToPulse(115));
+//LIMB 2 SEG 2
+board1.setPWM(5, 0, angleToPulse(65));
+//LIMB 2 SEG 3
+board1.setPWM(6, 0, angleToPulse(130));
 
-// //LIMB 3 SEG 1
-// test7.write(70);
-// //LIMB 3 SEG 2
-// test8.write(60);
-// //LIMB 3 SEG 3
-// test9.write(135);
+//LIMB 3 SEG 1
+board1.setPWM(7, 0, angleToPulse(70));
+//LIMB 3 SEG 2
+board1.setPWM(8, 0, angleToPulse(60));
+//LIMB 3 SEG 3
+board1.setPWM(9, 0, angleToPulse(135));
 
-// //LIMB 4 SEG 1
-// test10.write(90);
-// //LIMB 4 SEG 2
-// test11.write(65);
-// //LIMB 4 SEG 3
-// test12.write(125);
+//LIMB 4 SEG 1
+board2.setPWM(1, 0, angleToPulse(90));
+//LIMB 4 SEG 2
+board2.setPWM(2, 0, angleToPulse(65));
+//LIMB 4 SEG 3
+board2.setPWM(3, 0, angleToPulse(125));
 
-// //LIMB 5 SEG 1
-// test13.write(110);
-// //LIMB 5 SEG 2
-// test14.write(110);
-// //LIMB 5 SEG 3
-// test15.write(130);
+//LIMB 5 SEG 1
+board2.setPWM(4, 0, angleToPulse(110));
+//LIMB 5 SEG 2
+board2.setPWM(5, 0, angleToPulse(110));
+//LIMB 5 SEG 3
+board2.setPWM(6, 0, angleToPulse(130));
 
-// //LIMB 6 SEG 1
-// test16.write(80);
-// //LIMB 6 SEG 2
-// test17.write(60);
-// //LIMB 6 SEG 3
-// test18.write(130);
-// }
+//LIMB 6 SEG 1
+board2.setPWM(7, 0, angleToPulse(80));
+//LIMB 6 SEG 2
+board2.setPWM(8, 0, angleToPulse(60));
+//LIMB 6 SEG 3
+board2.setPWM(9, 0, angleToPulse(130));
+}
 
-// void testCrawlThree(){
-// //LIMB 1 SEG 1
-// test1.write(90);
-// //LIMB 1 SEG 2
-// test2.write(60);
-// //LIMB 1 SEG 3
-// test3.write(125);
+void testCrawlThree(){
+//LIMB 1 SEG 1
+board1.setPWM(1, 0, angleToPulse(90));
+//LIMB 1 SEG 2
+board1.setPWM(2, 0, angleToPulse(60));
+//LIMB 1 SEG 3
+board1.setPWM(3, 0, angleToPulse(125));
 
-// //LIMB 2 SEG 1
-// test4.write(90);
-// //LIMB 2 SEG 2
-// test5.write(120);
-// //LIMB 2 SEG 3
-// test6.write(125);
+//LIMB 2 SEG 1
+board1.setPWM(4, 0, angleToPulse(90));
+//LIMB 2 SEG 2
+board1.setPWM(5, 0, angleToPulse(120));
+//LIMB 2 SEG 3
+board1.setPWM(6, 0, angleToPulse(125));
 
-// //LIMB 3 SEG 1
-// test7.write(90);
-// //LIMB 3 SEG 2
-// test8.write(60);
-// //LIMB 3 SEG 3
-// test9.write(130);
+//LIMB 3 SEG 1
+board1.setPWM(7, 0, angleToPulse(90));
+//LIMB 3 SEG 2
+board1.setPWM(8, 0, angleToPulse(60));
+//LIMB 3 SEG 3
+board1.setPWM(9, 0, angleToPulse(130));
 
-// //LIMB 4 SEG 1
-// test10.write(90);
-// //LIMB 4 SEG 2
-// test11.write(120);
-// //LIMB 4 SEG 3
-// test12.write(120);
+//LIMB 4 SEG 1
+board2.setPWM(1, 0, angleToPulse(90));
+//LIMB 4 SEG 2
+board2.setPWM(2, 0, angleToPulse(120));
+//LIMB 4 SEG 3
+board2.setPWM(3, 0, angleToPulse(120));
 
-// //LIMB 5 SEG 1
-// test13.write(90);
-// //LIMB 5 SEG 2
-// test14.write(65);
-// //LIMB 5 SEG 3
-// test15.write(130);
+//LIMB 5 SEG 1
+board2.setPWM(4, 0, angleToPulse(90));
+//LIMB 5 SEG 2
+board2.setPWM(5, 0, angleToPulse(65));
+//LIMB 5 SEG 3
+board2.setPWM(6, 0, angleToPulse(130));
 
-// //LIMB 6 SEG 1
-// test16.write(90);
-// //LIMB 6 SEG 2
-// test17.write(130);
-// //LIMB 6 SEG 3
-// test18.write(130);
-// }
-
-// void testCrawlFour(){
-// //LIMB 1 SEG 1
-// test1.write(105);
-// //LIMB 1 SEG 2
-// test2.write(60);
-// //LIMB 1 SEG 3
-// test3.write(135);
-
-// //LIMB 2 SEG 1
-// test4.write(80);
-// //LIMB 2 SEG 2
-// test5.write(65);
-// //LIMB 2 SEG 3
-// test6.write(120);
-
-// //LIMB 3 SEG 1
-// test7.write(100);
-// //LIMB 3 SEG 2
-// test8.write(65);
-// //LIMB 3 SEG 3
-// test9.write(115);
-
-// //LIMB 4 SEG 1
-// test10.write(95);
-// //LIMB 4 SEG 2
-// test11.write(65);
-// //LIMB 4 SEG 3
-// test12.write(130);
-
-// //LIMB 5 SEG 1
-// test13.write(70);
-// //LIMB 5 SEG 2
-// test14.write(70);
-// //LIMB 5 SEG 3
-// test15.write(125);
-
-// //LIMB 6 SEG 1
-// test16.write(100);
-// //LIMB 6 SEG 2
-// test17.write(60);
-// //LIMB 6 SEG 3
-// test18.write(120);
-// }
+//LIMB 6 SEG 1
+board2.setPWM(7, 0, angleToPulse(60));
+//LIMB 6 SEG 2
+board2.setPWM(8, 0, angleToPulse(130));
+//LIMB 6 SEG 3
+board2.setPWM(9, 0, angleToPulse(130));
+}
 
 
-// void testCrawlForward() {
-// testCrawlOne();
-// testCrawlTwo();
-// testCrawlThree();
-// testCrawlFour();
-// }
+void testCrawlFour(){
+//LIMB 1 SEG 1
+board1.setPWM(1, 0, angleToPulse(105));
+//LIMB 1 SEG 2
+board1.setPWM(2, 0, angleToPulse(60));
+//LIMB 1 SEG 3
+board1.setPWM(3, 0, angleToPulse(135));
+
+//LIMB 2 SEG 1
+board1.setPWM(4, 0, angleToPulse(80));
+//LIMB 2 SEG 2
+board1.setPWM(5, 0, angleToPulse(65));
+//LIMB 2 SEG 3
+board1.setPWM(6, 0, angleToPulse(125));
+
+//LIMB 3 SEG 1
+board1.setPWM(7, 0, angleToPulse(100));
+//LIMB 3 SEG 2
+board1.setPWM(8, 0, angleToPulse(65));
+//LIMB 3 SEG 3
+board1.setPWM(9, 0, angleToPulse(115));
+
+//LIMB 4 SEG 1
+board2.setPWM(1, 0, angleToPulse(95));
+//LIMB 4 SEG 2
+board2.setPWM(2, 0, angleToPulse(65));
+//LIMB 4 SEG 3
+board2.setPWM(3, 0, angleToPulse(135));
+
+//LIMB 5 SEG 1
+board2.setPWM(4, 0, angleToPulse(70));
+//LIMB 5 SEG 2
+board2.setPWM(5, 0, angleToPulse(70));
+//LIMB 5 SEG 3
+board2.setPWM(6, 0, angleToPulse(125));
+
+//LIMB 6 SEG 1
+board2.setPWM(7, 0, angleToPulse(100));
+//LIMB 6 SEG 2
+board2.setPWM(8, 0, angleToPulse(60));
+//LIMB 6 SEG 3
+board2.setPWM(9, 0, angleToPulse(120));
+}
+
+void crawlForward(){
+testCrawlOne();
+testCrawlTwo();
+testCrawlThree();
+testCrawlFour();
+}

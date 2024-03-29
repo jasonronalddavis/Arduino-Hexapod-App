@@ -1,11 +1,15 @@
-//I am now able to successully control all servos with my react app
-// My next step is to implement a crawling motion for my hexapod via bluetooth.
-// I would like crawForward(); to continuosly loop while crawlf == true. Holding down
-// the "Crawl Forward" button on my react app sends byte 11. On main.cpp, if byte 11 is received,
-// then crawlf = true. Upon releasing the Crawl Forward button in react, byte 14 is transmitted.
-// If byte 14 is received, then Crawl Forward = false. Can you modify hexapodControl component, main.cpp,
-// and/or test.cpp if necessary?
+// Unfortunately, I cannot get crawlForward to loop properly after trying various methods.
+//  Function crawlForward either swiftly loops once or not at all. Perhaps 
+//  I am going about this the wrong way. Function crawlForward contains crawlOne, 
+//  crawlTwo, crawlThree, and crawlFour in chronological order. Each function moves 18 mg996r 
+//  servos accordingly to simulate a crawling motion for my hexapod. 
+//  Think of each function as key frames in an animation. Upon holding down the crawl 
+//  forward button in react, crawlForward should be continuously ran on a loop until the 
+//  button is released. Can you implement this functionality for me?
 
+https://github.com/jasonronalddavis/Hexapod-control-react-app/tree/master/peanut-app
+
+// Current code:
 
 //main.cpp
 #include <Arduino.h>
@@ -25,6 +29,7 @@
 NimBLEServer* pServer = nullptr;
 NimBLECharacteristic* pCharacteristic = nullptr;
 bool deviceConnected = false;
+bool crawlf = false; // Variable to track crawling motion
 
 
 void processReceivedData(const char* data);
@@ -55,20 +60,22 @@ class MyCallbacks : public NimBLECharacteristicCallbacks {
 void processReceivedData(const char* data) {
   int dataAsInt = atoi(data);
   if (dataAsInt == 83) {
-      Serial.println("Stretching..."); 
-      testStretch();
+    Serial.println("Stretching..."); 
+    testStretch();
   }
-  if (dataAsInt == 18) {    
-       Serial.println("Lifting and Standing..."); 
-      testLift();
+  else if (dataAsInt == 18) {    
+    Serial.println("Lifting and Standing..."); 
+    testLift();
   }
-    if (dataAsInt == 13) {    
-       Serial.println("Lifting and Standing..."); 
-      testStand();
+    else if (dataAsInt == 13) {    
+    Serial.println("Lifting and Standing..."); 
+    testStand();
   }
- 
+  else if (dataAsInt == 11) {    
+    Serial.println("Crawling forward..."); 
+  crawlf == true;
+  }
 }
-
 
 void setup() {
   Serial.begin(115200);
@@ -80,7 +87,6 @@ void setup() {
       CHARACTERISTIC_UUID_RX,
       NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::NOTIFY);
   pCharacteristic->setCallbacks(new MyCallbacks());
-
   pService->start();
   NimBLEAdvertising* pAdvertising = pServer->getAdvertising();
   pAdvertising->start();
@@ -93,8 +99,484 @@ void loop() {
     Serial.println("Barnes!");
     Serial1.println(receivedData);
     processReceivedData(receivedData.c_str());
-  }
+    // If crawlForward is true, continuously call the crawlForward function
+
+}
+
+if (crawlf == true){
+crawlForward();
+}
+
+}
+//test.cpp
+#include <Arduino.h>
+#include <Wire.h>
+#include <ESP32Servo.h>
+#include <Adafruit_PWMServoDriver.h>
+
+#define SERVO_COUNT_ESP32 18 // Number of servos attached to ESP32
+
+// Servo servos_ESP32[SERVO_COUNT_ESP32]; // Array to hold ESP32 servo objects
+Adafruit_PWMServoDriver board1 = Adafruit_PWMServoDriver(0x40); // Initialize the PCA9685 object for board 1
+Adafruit_PWMServoDriver board2 = Adafruit_PWMServoDriver(0x41); // Initialize the PCA9685 object for board 2
+
+void initTest(){
+ board1.begin(); // Begin communication with board 1
+  board1.setPWMFreq(60); // Set PWM frequency to 60Hz
+
+
+   board2.begin(); // Begin communication with board 1
+  board2.setPWMFreq(60); // Set PWM frequency to 60Hz
+}
+
+int angleToPulse(int ang) {
+  int SERVOMIN = 125; // Minimum pulse length count
+  int SERVOMAX = 575; // Maximum pulse length count
+  int pulse = map(ang, 0, 180, SERVOMIN, SERVOMAX); // Map angle to pulse width
+  Serial.print("Angle: "); Serial.print(ang);
+  Serial.print(" pulse: "); Serial.println(pulse);
+  return pulse;
+}
+
+void testStretch(){
+    for (int servoNum = 0; servoNum < 18; servoNum++) {
+        board1.setPWM(servoNum + 1, 0, angleToPulse(90)); // Set servo to 90 degrees on board 1
+        board2.setPWM(servoNum + 1, 0, angleToPulse(90)); // Set servo to 90 degrees on board 2
+    }
+}
+
+
+void testLift() {
+  // LIMB 1 SEG 1 (Hip)
+  board1.setPWM(1, 0, angleToPulse(90));
+  // LIMB 1 SEG 2 (Knee)
+  board1.setPWM(2, 0, angleToPulse(150));
+  // LIMB 1 SEG 3 (Ankle)
+  board1.setPWM(3, 0, angleToPulse(125));
+
+  // LIMB 2 SEG 1 (Hip)
+  board1.setPWM(4, 0, angleToPulse(90));
+  // LIMB 2 SEG 2 (Knee)
+  board1.setPWM(5, 0, angleToPulse(150));
+  // LIMB 2 SEG 3 (Ankle)
+  board1.setPWM(6, 0, angleToPulse(125));
+
+  // LIMB 3 SEG 1 (Hip)
+  board1.setPWM(7, 0, angleToPulse(90));
+  // LIMB 3 SEG 2 (Knee)
+  board1.setPWM(8, 0, angleToPulse(150));
+  // LIMB 3 SEG 3 (Ankle)
+  board1.setPWM(9, 0, angleToPulse(125));
+
+  // LIMB 4 SEG 1 (Hip)
+  board2.setPWM(1, 0, angleToPulse(90));
+  // LIMB 4 SEG 2 (Knee)
+  board2.setPWM(2, 0, angleToPulse(150));
+  // LIMB 4 SEG 3 (Ankle)
+  board2.setPWM(3, 0, angleToPulse(125));
+
+  // LIMB 5 SEG 1 (Hip)
+  board2.setPWM(4, 0, angleToPulse(90));
+  // LIMB 5 SEG 2 (Knee)
+  board2.setPWM(5, 0, angleToPulse(150));
+  // LIMB 5 SEG 3 (Ankle)
+  board2.setPWM(6, 0, angleToPulse(125));
+
+    // LIMB 5 SEG 1 (Hip)
+  board2.setPWM(7, 0, angleToPulse(90));
+  // LIMB 5 SEG 2 (Knee)
+  board2.setPWM(8, 0, angleToPulse(150));
+  // LIMB 5 SEG 3 (Ankle)
+  board2.setPWM(9, 0, angleToPulse(125));
 }
 
 
 
+ void testStand() {
+  // LIMB 1 SEG 1 (Hip)
+  board1.setPWM(1, 0, angleToPulse(90));
+  // LIMB 1 SEG 2 (Knee)
+  board1.setPWM(2, 0, angleToPulse(60));
+  // LIMB 1 SEG 3 (Ankle)
+  board1.setPWM(3, 0, angleToPulse(150));
+
+  // LIMB 2 SEG 1 (Hip)
+  board1.setPWM(4, 0, angleToPulse(90));
+  // LIMB 2 SEG 2 (Knee)
+  board1.setPWM(5, 0, angleToPulse(60));
+  // LIMB 2 SEG 3 (Ankle)
+  board1.setPWM(6, 0, angleToPulse(150));
+
+  // LIMB 3 SEG 1 (Hip)
+  board1.setPWM(7, 0, angleToPulse(90));
+  // LIMB 3 SEG 2 (Knee)
+  board1.setPWM(8, 0, angleToPulse(60));
+  // LIMB 3 SEG 3 (Ankle)
+  board1.setPWM(9, 0, angleToPulse(150));
+
+  // LIMB 4 SEG 1 (Hip)
+  board2.setPWM(1, 0, angleToPulse(90));
+  // LIMB 4 SEG 2 (Knee)
+  board2.setPWM(2, 0, angleToPulse(60));
+  // LIMB 4 SEG 3 (Ankle)
+  board2.setPWM(3, 0, angleToPulse(150));
+
+  // LIMB 5 SEG 1 (Hip)
+  board2.setPWM(4, 0, angleToPulse(90));
+  // LIMB 5 SEG 2 (Knee)
+  board2.setPWM(5, 0, angleToPulse(60));
+  // LIMB 5 SEG 3 (Ankle)
+  board2.setPWM(6, 0, angleToPulse(150));
+
+    // LIMB 5 SEG 1 (Hip)
+  board2.setPWM(7, 0, angleToPulse(90));
+  // LIMB 5 SEG 2 (Knee)
+  board2.setPWM(8, 0, angleToPulse(60));
+  // LIMB 5 SEG 3 (Ankle)
+  board2.setPWM(9, 0, angleToPulse(150));
+}
+
+
+
+
+void testCrawlOne() {
+  // LIMB 1 SEG 1
+   board1.setPWM(1, 0, angleToPulse(90));
+  // LIMB 1 SEG 2
+  board1.setPWM(2, 0, angleToPulse(130));
+  // LIMB 1 SEG 3
+  board1.setPWM(3, 0, angleToPulse(135));
+
+  // LIMB 2 SEG 1
+   board1.setPWM(4, 0, angleToPulse(90));
+  // LIMB 2 SEG 2
+   board1.setPWM(5, 0, angleToPulse(60));
+  // LIMB 2 SEG 3
+   board1.setPWM(6, 0, angleToPulse(125));
+
+  // LIMB 3 SEG 1
+   board1.setPWM(7, 0, angleToPulse(90));
+  // LIMB 3 SEG 2
+   board1.setPWM(8, 0, angleToPulse(120));
+  // LIMB 3 SEG 3
+   board1.setPWM(9, 0, angleToPulse(120));
+
+  // LIMB 4 SEG 1
+   board2.setPWM(1, 0, angleToPulse(90));
+  // LIMB 4 SEG 2
+   board2.setPWM(2, 0, angleToPulse(60));
+  // LIMB 4 SEG 3
+   board2.setPWM(3, 0, angleToPulse(130));
+
+  // LIMB 5 SEG 1
+   board2.setPWM(4, 0, angleToPulse(90));
+  // LIMB 5 SEG 2
+   board2.setPWM(5, 0, angleToPulse(120));
+  // LIMB 5 SEG 3
+   board2.setPWM(6, 0, angleToPulse(120));
+
+  // LIMB 6 SEG 1
+   board2.setPWM(7, 0, angleToPulse(90));
+  // LIMB 6 SEG 2
+   board2.setPWM(8, 0, angleToPulse(60));
+  // LIMB 6 SEG 3
+   board2.setPWM(9, 0, angleToPulse(120));
+}
+
+
+void testCrawlTwo(){
+//LIMB 1 SEG 1
+board1.setPWM(1, 0, angleToPulse(65));
+//LIMB 1 SEG 2
+board1.setPWM(2, 0, angleToPulse(60));
+//LIMB 1 SEG 3
+board1.setPWM(3, 0, angleToPulse(120));
+
+//LIMB 2 SEG 1
+board1.setPWM(4, 0, angleToPulse(115));
+//LIMB 2 SEG 2
+board1.setPWM(5, 0, angleToPulse(65));
+//LIMB 2 SEG 3
+board1.setPWM(6, 0, angleToPulse(130));
+
+//LIMB 3 SEG 1
+board1.setPWM(7, 0, angleToPulse(70));
+//LIMB 3 SEG 2
+board1.setPWM(8, 0, angleToPulse(60));
+//LIMB 3 SEG 3
+board1.setPWM(9, 0, angleToPulse(135));
+
+//LIMB 4 SEG 1
+board2.setPWM(1, 0, angleToPulse(90));
+//LIMB 4 SEG 2
+board2.setPWM(2, 0, angleToPulse(65));
+//LIMB 4 SEG 3
+board2.setPWM(3, 0, angleToPulse(125));
+
+//LIMB 5 SEG 1
+board2.setPWM(4, 0, angleToPulse(110));
+//LIMB 5 SEG 2
+board2.setPWM(5, 0, angleToPulse(110));
+//LIMB 5 SEG 3
+board2.setPWM(6, 0, angleToPulse(130));
+
+//LIMB 6 SEG 1
+board2.setPWM(7, 0, angleToPulse(80));
+//LIMB 6 SEG 2
+board2.setPWM(8, 0, angleToPulse(60));
+//LIMB 6 SEG 3
+board2.setPWM(9, 0, angleToPulse(130));
+}
+
+void testCrawlThree(){
+//LIMB 1 SEG 1
+board1.setPWM(1, 0, angleToPulse(90));
+//LIMB 1 SEG 2
+board1.setPWM(2, 0, angleToPulse(60));
+//LIMB 1 SEG 3
+board1.setPWM(3, 0, angleToPulse(125));
+
+//LIMB 2 SEG 1
+board1.setPWM(4, 0, angleToPulse(90));
+//LIMB 2 SEG 2
+board1.setPWM(5, 0, angleToPulse(120));
+//LIMB 2 SEG 3
+board1.setPWM(6, 0, angleToPulse(125));
+
+//LIMB 3 SEG 1
+board1.setPWM(7, 0, angleToPulse(90));
+//LIMB 3 SEG 2
+board1.setPWM(8, 0, angleToPulse(60));
+//LIMB 3 SEG 3
+board1.setPWM(9, 0, angleToPulse(130));
+
+//LIMB 4 SEG 1
+board2.setPWM(1, 0, angleToPulse(90));
+//LIMB 4 SEG 2
+board2.setPWM(2, 0, angleToPulse(120));
+//LIMB 4 SEG 3
+board2.setPWM(3, 0, angleToPulse(120));
+
+//LIMB 5 SEG 1
+board2.setPWM(4, 0, angleToPulse(90));
+//LIMB 5 SEG 2
+board2.setPWM(5, 0, angleToPulse(65));
+//LIMB 5 SEG 3
+board2.setPWM(6, 0, angleToPulse(130));
+
+//LIMB 6 SEG 1
+board2.setPWM(7, 0, angleToPulse(60));
+//LIMB 6 SEG 2
+board2.setPWM(8, 0, angleToPulse(130));
+//LIMB 6 SEG 3
+board2.setPWM(9, 0, angleToPulse(130));
+}
+
+
+void testCrawlFour(){
+//LIMB 1 SEG 1
+board1.setPWM(1, 0, angleToPulse(105));
+//LIMB 1 SEG 2
+board1.setPWM(2, 0, angleToPulse(60));
+//LIMB 1 SEG 3
+board1.setPWM(3, 0, angleToPulse(135));
+
+//LIMB 2 SEG 1
+board1.setPWM(4, 0, angleToPulse(80));
+//LIMB 2 SEG 2
+board1.setPWM(5, 0, angleToPulse(65));
+//LIMB 2 SEG 3
+board1.setPWM(6, 0, angleToPulse(125));
+
+//LIMB 3 SEG 1
+board1.setPWM(7, 0, angleToPulse(100));
+//LIMB 3 SEG 2
+board1.setPWM(8, 0, angleToPulse(65));
+//LIMB 3 SEG 3
+board1.setPWM(9, 0, angleToPulse(115));
+
+//LIMB 4 SEG 1
+board2.setPWM(1, 0, angleToPulse(95));
+//LIMB 4 SEG 2
+board2.setPWM(2, 0, angleToPulse(65));
+//LIMB 4 SEG 3
+board2.setPWM(3, 0, angleToPulse(135));
+
+//LIMB 5 SEG 1
+board2.setPWM(4, 0, angleToPulse(70));
+//LIMB 5 SEG 2
+board2.setPWM(5, 0, angleToPulse(70));
+//LIMB 5 SEG 3
+board2.setPWM(6, 0, angleToPulse(125));
+
+//LIMB 6 SEG 1
+board2.setPWM(7, 0, angleToPulse(100));
+//LIMB 6 SEG 2
+board2.setPWM(8, 0, angleToPulse(60));
+//LIMB 6 SEG 3
+board2.setPWM(9, 0, angleToPulse(120));
+}
+
+void crawlForward(){
+testCrawlOne();
+testCrawlTwo();
+testCrawlThree();
+testCrawlFour();
+}
+
+
+
+// HexapodControl.js
+
+import React, { useState } from 'react';
+import BluetoothService from '../Bluetooth/bluetoothServices';
+import './controller.css';
+
+const HexapodControl = ({ device }) => {
+
+  const [crawlForward, setCrawlForward] = useState(false); // State for tracking crawling forward action
+
+  const handleCrawlStart = () => {
+    console.log('Crawling forward...');
+    if (device) {
+      console.log('Transmitting command: 11');
+      BluetoothService.sendCommand(device, new Uint8Array([11])); // Send the command to start crawling forward
+      setCrawlForward(true); // Set the state to indicate crawling forward
+    }
+  };
+
+  const handleCrawlStop = () => {
+    console.log('Stopping crawl...');
+    if (device) {
+      console.log('Transmitting command: 14');
+      BluetoothService.sendCommand(device, new Uint8Array([13])); // Send the command to stop crawling
+      setCrawlForward(false); // Set the state to indicate not crawling
+    }
+  };
+  const handleBackward = () => {
+    console.log('Device:', device);
+    if (device) {
+      console.log('Transmitting command: B');
+      BluetoothService.sendCommand(device, new Uint8Array([66])); // ASCII code for 'B'
+    }
+  };
+
+  const handleStretch = () => {
+    console.log('Device:', device);
+    if (device) {
+      console.log('Transmitting command: S');
+      BluetoothService.sendCommand(device, new Uint8Array([83])); // ASCII code for 'S'
+    }
+  };
+
+  const standLift = () => {
+    console.log('Device:', device);
+    if (device) {
+      console.log('Transmitting command: L');
+      BluetoothService.sendCommand(device, new Uint8Array([18])); // ASCII code for 'S'
+    }
+  };
+
+  const handleEyeballXChange = (value) => {
+    console.log('Eyeball X-Axis:', value);
+    if (device) {
+      const byteValue = Number(value); // Convert the value to a number
+      const byteCommand = new Uint8Array([byteValue]); // Create a Uint8Array with the byte value
+      BluetoothService.sendCommand(device, byteCommand); // Send the byte command to adjust eyeball X-axis
+    }
+  };
+  
+  const handleEyeballYChange = (value) => {
+    console.log('Eyeball Y-Axis:', value);
+    if (device) {
+      const byteValue = Number(value); // Convert the value to a number
+      const byteCommand = new Uint8Array([byteValue]); // Create a Uint8Array with the byte value
+      BluetoothService.sendCommand(device, byteCommand); // Send the byte command to adjust eyeball X-ax
+    }
+  };
+  
+  const handleEyelidChange = (value) => {
+    console.log('Eyelid:', value);
+    if (device) {
+      const command = `L${value}`; // Command format for adjusting eyelid position
+      BluetoothService.sendCommand(device, new Uint8Array([...command])); // Send the command to adjust eyelid position
+    }
+  };
+  
+  const handleBlink = () => {
+    console.log('Blinking...');
+    if (device) {
+      console.log('Transmitting command: 10');
+      BluetoothService.sendCommand(device, new Uint8Array([10])); // Send the command for blinking
+    }
+  };
+  
+  const handleButtonUp = () => {
+    console.log('Button released');
+    if (device) {
+      console.log('Transmitting command: 15');
+      BluetoothService.sendCommand(device, new Uint8Array([15]));
+    }
+  };
+  
+  const standUp = () => {
+    console.log('Button released');
+    if (device) {
+      console.log('Transmitting command: 13');
+      BluetoothService.sendCommand(device, new Uint8Array([13]));
+    }
+  };
+
+  return (
+
+    <div className="buttons">
+         <div className="legs">
+      <button
+        onMouseDown={handleBackward}
+        onMouseUp={handleButtonUp}
+      >
+        Move Backward
+      </button>
+      <button
+        onMouseDown={handleCrawlStart}
+        onMouseUp={handleCrawlStop}
+      >
+        Move Forward
+      </button>
+      <button
+        onMouseDown={handleStretch}
+      >
+        Stretch
+      </button>
+      <button
+        onMouseDown={standLift}
+        onMouseUp={standUp}
+      >
+        Stand
+      </button>
+      </div>
+
+      
+      <div className='sliders'>
+      <div>
+        <label className= "xLabel" >X-Axis:</label>
+        <input className="xSlider" type="range" min="20" max="160" defaultValue="65" onChange={(e) => handleEyeballXChange(e.target.value)} />
+      </div>
+      <div className = "eyeY">
+        <label className= "yLabel">Y-Axis:</label>
+        <input className="ySlider" type="range" min="20" max="90" defaultValue="40" onChange={(e) => handleEyeballYChange(e.target.value)} />
+      </div>
+      <div className="eyelid">
+        <label className ="lidLabel">Eyelid:</label>
+        <input className="lidSlider" type="range" min="10" max="180" onChange={(e) => handleEyelidChange(e.target.value)} />
+      </div>
+     <button className="blink" onMouseDown={handleBlink} onMouseUp={handleButtonUp}>
+  Blink
+</button>
+
+    </div>
+    </div>
+  );
+};
+
+export default HexapodControl;

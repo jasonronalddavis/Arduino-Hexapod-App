@@ -15,4 +15,5 @@ int angleToPulse(int ang);
 void testStretch();
 void testLift();
 void testStand();
+void crawlForward();
 #endif
