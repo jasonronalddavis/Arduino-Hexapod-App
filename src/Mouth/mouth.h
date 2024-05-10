@@ -7,6 +7,8 @@
 
 extern Adafruit_PWMServoDriver mBoard;
 // Function declarations
+int mouthPulse(int ang);
 void initMouth();
-void mouthFunction();
+void mouthUp();
+void mouthDown();
 #endif

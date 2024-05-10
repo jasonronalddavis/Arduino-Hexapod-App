@@ -3,6 +3,9 @@
         "lib"
     ],
     "files.associations": {
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "array": "cpp",
+        "string": "cpp",
+        "string_view": "cpp"
     }
 }

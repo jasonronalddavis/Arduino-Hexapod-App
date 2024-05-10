@@ -11,7 +11,7 @@ int eyePulse(int ang);
 int blinkPulse(int ang);
 void moveEyeballX(int angle);
 void moveEyeballY(int angle);
-void eyelid(int angle);
+void eyeLid(int angle);
 void blinkDown();
 void blinkUp();
 

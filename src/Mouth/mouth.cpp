@@ -1,9 +1,7 @@
 #include <Arduino.h>
 #include <Wire.h>
-#include <ESP32Servo.h>
 #include <Adafruit_PWMServoDriver.h>
 #include <SPI.h>
-#define SERVO_COUNT_ESP32 18 // Number of servos attached to ESP32
 
 // Servo servos_ESP32[SERVO_COUNT_ESP32]; // Array to hold ESP32 servo objects
 Adafruit_PWMServoDriver mBoard = Adafruit_PWMServoDriver(0x41); // Initialize the PCA9685 object for board 2
@@ -28,18 +26,16 @@ int mouthPulse(int ang) {
   return pulse;
 }
 
+// void mouthFunction(int angle) {
+//   int pulse = mouthPulse(angle);
+//     mBoard.setPWM(13, 0, pulse); // Adjust the servo motor connected to control the eyeball along the X-axis
+//   // Adjust the servo motor connected to control the eyeball along the X-axis
+// }
 
+void mouthUp(){
+    mBoard.setPWM(13, 0, mouthPulse(45)); // Adjust the servo motor connected to control the eyeball along the X-axis
+}
 
-
-void mouthFunction() {
-
- mBoard.setPWM(1, 0, mouthPulse(70));
-
-//     mouth.write(70);
-//   delay(300);
-//   mouth.write(130);
-//   delay(300);
-//   mouth.write(70);
-//   delay(300);
-//    mouth.write(130);
+void mouthDown(){
+    mBoard.setPWM(13, 0,  mouthPulse(130)); // Adjust the servo motor connected to control the eyeball along the X-axis
 }

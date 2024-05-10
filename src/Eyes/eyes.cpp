@@ -2,11 +2,10 @@
 //eyes.cpp
 #include <Arduino.h>
 #include <Wire.h>
-#include <ESP32Servo.h>
 #include <Adafruit_PWMServoDriver.h>
 #include <SPI.h>
 // Servo servos_ESP32[SERVO_COUNT_ESP32]; // Array to hold ESP32 servo objects
-Adafruit_PWMServoDriver eBoard = Adafruit_PWMServoDriver(0x40); // Initialize the PCA9685 object for board 1
+Adafruit_PWMServoDriver eBoard = Adafruit_PWMServoDriver(0x41); // Initialize the PCA9685 object for board 1
 
 void initEyes(){
  eBoard.begin(); // Begin communication with board 1
@@ -52,9 +51,9 @@ void moveEyeballY(int angle) {
 }
 
 
-void eyelid(int angle) {
+void eyeLid(int angle) {
  int pulse = blinkPulse(angle);
-  // Adjust the servo motor connected to control the eyeball along the Y-axis
+    eBoard.setPWM(12, 0, pulse); 
 }
 
 
@@ -64,7 +63,7 @@ void blinkDown() {
 }
 
 void blinkUp() {
-  eBoard.setPWM(12, 0, blinkPulse(150));
+  eBoard.setPWM(12, 0, blinkPulse(120));
 }
 
 

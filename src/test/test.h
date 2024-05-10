@@ -16,4 +16,5 @@ void testStretch();
 void testLift();
 void testStand();
 void crawlForward();
+void testBend();
 #endif
