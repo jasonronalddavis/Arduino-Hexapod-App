@@ -15,15 +15,15 @@ NimBLEServer* pServer = nullptr;
 NimBLECharacteristic* pCharacteristic = nullptr;
 bool deviceConnected = false;
 bool crawlf = false; // Variable to track crawling motion
+bool crawlb = false; // Variable to track crawling motion
 bool eyeY = false;
-bool eyeX= false;
+bool eyeX = false;
 bool blink_up = false;
 bool blink_down;
 bool mouth = false;
 
 void processReceivedData(const char* data);
 // void moveEye(int data); // Function prototype declaration
-
 
 #define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 #define CHARACTERISTIC_UUID_RX "beb5483e-36e1-4688-b7f5-ea07361b26a8"
@@ -54,7 +54,6 @@ void processReceivedData(const char* data) {
   if (dataAsInt == 21){
     mouthUp();
   }
-
   if (strncmp(data, "x", 1) == 0){
     int eyeData = atoi(data + 1);
      moveEyeballX(eyeData);
@@ -90,7 +89,7 @@ void processReceivedData(const char* data) {
     crawlf = false;
   }
   if (strncmp(data, "B", 1) == 0){
-    Serial.println("Lifting and Standing..."); 
+    Serial.println("bending..."); 
       testBend();
       crawlf = false;
   }
@@ -103,6 +102,12 @@ void processReceivedData(const char* data) {
   if (strncmp(data, "F", 1) == 0) {    
     Serial.println("Crawling forward..."); 
     crawlf = true;
+    crawlb = false;
+  }
+    if (strncmp(data, "Z", 1) == 0) {    
+    Serial.println("Crawling backward...");
+    crawlb = true;
+    crawlf = false;
   }
   if (strncmp(data, "d", 1) == 0) {    
        Serial.println("15");
@@ -120,32 +125,7 @@ void processReceivedData(const char* data) {
       eyeY= false;
        blinkDown();
   }
-
 }
-
-
-// void moveEye(int data){
-// int eyeData = data;
-//       Serial.print("Received Value: ");
-//       Serial.println(data);
-// if (eyeData >= 0 && eyeData >= 180){
-//    Serial.print("Adjusting Eyeball X-Axis to: "); 
-//     Serial.println(eyeData);
-//     blink_up = false;
-//     blink_down = false;
-//     eyeY= false;
-//     moveEyeballX(eyeData);  
-// }
-
-//  else if (eyeData >= 0 && eyeData >= 180){
-//     Serial.print("Adjusting Eyeball Y-Axis to: "); 
-//     blink_up = false;
-//     blink_down = false;
-//     eyeX= false;
-//     Serial.println(eyeData);
-//     moveEyeballY(eyeData);
-//   }
-// }
 
 
 void setup() {
@@ -175,5 +155,8 @@ void loop() {
 }
 if (crawlf == true){ 
 crawlForward();
+}
+if (crawlb == true){ 
+crawlBackward();
 }
 }
