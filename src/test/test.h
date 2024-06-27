@@ -18,4 +18,6 @@ void testStand();
 void crawlForward();
 void testBend();
 void crawlBackward();
+void crawlLeft();
+void crawlRight();
 #endif
