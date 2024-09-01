@@ -1,88 +1,76 @@
-It appears that my esp32 code is not configured to receive sring data, only byte data. It
-appears that template literals will only transmit integers. Browser console data:
+I have installed the ESP32-audioI2S library. Here is an example 
 
-Connected to Hexapod: PEANUT
-BluetoothController.js:14 Handling Bluetooth connection...
-bluetoothServices.js:12 Connected to Hexapod: PEANUT
-bluetoothServices.js:28 Sending command: Uint8Array(3) [0, 7, 2, buffer: ArrayBuffer(3), byteLength: 3, byteOffset: 0, length: 3, Symbol(Symbol.toStringTag): 'Uint8Array']
-hexapodControl.js:72 Eyeball X-Axis: x72
-bluetoothServices.js:41 Command sent successfully
-bluetoothServices.js:28 Sending command: Uint8Array(3) [0, 7, 3, buffer: ArrayBuffer(3), byteLength: 3, byteOffset: 0, length: 3, Symbol(Symbol.toStringTag): 'Uint8Array']0: 01: 72: 3buffer: ArrayBuffer(3)byteLength: 3byteOffset: 0length: 3Symbol(Symbol.toStringTag): "Uint8Array"[[Prototype]]: TypedArray
-hexapodControl.js:72 Eyeball X-Axis: x73
-bluetoothServices.js:41 Command sent successfully
-bluetoothServices.js:28 Sending command: Uint8Array(3) [0, 7, 4, buffer: ArrayBuffer(3), byteLength: 3, byteOffset: 0, length: 3, Symbol(Symbol.toStringTag): 'Uint8Array']
-hexapodControl.js:72 Eyeball X-Axis: x74
-bluetoothServices.js:28 Sending command: Uint8Array(3) [0, 7, 5, buffer: ArrayBuffer(3), byteLength: 3, byteOffset: 0, length: 3, Symbol(Symbol.toStringTag): 'Uint8Array']
-hexapodControl.js:72 Eyeball X-Axis: x75
-bluetoothServices.js:43 Failed to send command: DOMException: GATT operation already in progress.
-overrideMethod @ console.js:213
-sendCommand @ bluetoothServices.js:43
-await in sendCommand (async)
-handleEyeballXChange @ hexapodControl.js:71
-onChange @ hexapodControl.js:179
-callCallback @ react-dom.development.js:4164
-invokeGuardedCallbackDev @ react-dom.development.js:4213
-invokeGuardedCallback @ react-dom.development.js:4277
-invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
-executeDispatch @ react-dom.development.js:9041
-processDispatchQueueItemsInOrder @ react-dom.development.js:9073
-processDispatchQueue @ react-dom.development.js:9086
-dispatchEventsForPlugins @ react-dom.development.js:9097
-(anonymous) @ react-dom.development.js:9288
-batchedUpdates$1 @ react-dom.development.js:26140
-batchedUpdates @ react-dom.development.js:3991
-dispatchEventForPluginEventSystem @ react-dom.development.js:9287
-dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
-dispatchEvent @ react-dom.development.js:6457
-dispatchDiscreteEvent @ react-dom.development.js:6430
-Show 16 more frames
-Show less
-bluetoothServices.js:41 Command sent successfully
-bluetoothServices.js:28 Sending command: Uint8Array(3) [0, 7, 6, buffer: ArrayBuffer(3), byteLength: 3, byteOffset: 0, length: 3, Symbol(Symbol.toStringTag): 'Uint8Array']
-hexapodControl.js:72 Eyeball X-Axis: x76
-bluetoothServices.js:41 Command sent successfully
-bluetoothServices.js:28 Sending command: Uint8Array(3) [0, 7, 7, buffer: ArrayBuffer(3), byteLength: 3, byteOffset: 0, length: 3, Symbol(Symbol.toStringTag): 'Uint8Array']
-hexapodControl.js:72 Eyeball X-Axis: x77
-Command sent successfully
-hexapodControl.js:96 Device: BluetoothDevice {id: 'iNl1zcMVXv9RoCbdEDq51A==', name: 'PEANUT', gatt: BluetoothRemoteGATTServer, ongattserverdisconnected: null}
-hexapodControl.js:98 Transmitting command: L
-bluetoothServices.js:28 Sending command: Uint8Array [21, buffer: ArrayBuffer(1), byteLength: 1, byteOffset: 0, length: 1, Symbol(Symbol.toStringTag): 'Uint8Array']
-bluetoothServices.js:41 Command sent successfully
-hexapodControl.js:88 Device: BluetoothDevice {id: 'iNl1zcMVXv9RoCbdEDq51A==', name: 'PEANUT', gatt: BluetoothRemoteGATTServer, ongattserverdisconnected: null}
-hexapodControl.js:90 Transmitting command: L
-bluetoothServices.js:28 Sending command: Uint8Array [20, buffer: ArrayBuffer(1), byteLength: 1, byteOffset: 0, length: 1, Symbol(Symbol.toStringTag): 'Uint8Array']
-bluetoothServices.js:41 Command sent successfully
-hexapodControl.js:96 Device: BluetoothDevice {id: 'iNl1zcMVXv9RoCbdEDq51A==', name: 'PEANUT', gatt: BluetoothRemoteGATTServer, ongattserverdisconnected: null}
-hexapodControl.js:98 Transmitting command: L
-bluetoothServices.js:28 Sending command: Uint8Array [21, buffer: ArrayBuffer(1), byteLength: 1, byteOffset: 0, length: 1, Symbol(Symbol.toStringTag): 'Uint8Array']
-bluetoothServices.js:41 Command sent successfully
-hexapodControl.js:88 Device: BluetoothDevice {id: 'iNl1zcMVXv9RoCbdEDq51A==', name: 'PEANUT', gatt: BluetoothRemoteGATTServer, ongattserverdisconnected: null}
-hexapodControl.js:90 Transmitting command: L
-bluetoothServices.js:28 Sending command: Uint8Array [20, buffer: ArrayBuffer(1), byteLength: 1, byteOffset: 0, length: 1, Symbol(Symbol.toStringTag): 'Uint8Array']
-bluetoothServices.js:41 Command sent successfully
+#include "Arduino.h"
+#include "Audio.h"
+#include "SD.h"
+#include "SPI.h"
+#include "FS.h"
+#include "Ticker.h"
 
+// Digital I/O used
+#define SD_CS          5
+#define SPI_MOSI      23
+#define SPI_MISO      19
+#define SPI_SCK       18
+#define I2S_DOUT      25
+#define I2S_BCLK      27
+#define I2S_LRC       26
 
-My serial monitor value is not preceeded with an "x" or "y", only an integer. 
-Serial monitor data: 
-16:36:43:968 -> Received Value: 0,9,2
-16:36:44:676 -> Received Value: 0,9,1
-16:36:44:755 -> Received Value: 0,9,0
-16:36:45:002 -> Received Value: 0,8,9
-16:36:45:092 -> Received Value: 0,8,8
-16:36:45:138 -> Received Value: 0,8,7
-16:36:45:189 -> Received Value: 0,8,6
-16:36:45:340 -> Received Value: 0,8,5
-16:36:45:730 -> Received Value: 0,8,6
-16:36:47:084 -> Received Value: 21
-16:36:47:196 -> Received Value: 20
-16:36:47:342 -> Received Value: 21
-16:36:47:444 -> Received Value: 20
+Audio audio;
+Ticker ticker;
+struct tm timeinfo;
+time_t now;
 
-My esp32 needs to receive string data as well as byte data so that I can exaluate x axis
-data from y axis data. Otherwise, moveEyeballX(eyeData); and moveEyeballY(eyeData); will come into conflict.
+uint8_t hour    = 6;
+uint8_t minute  = 59;
+uint8_t sec     = 45;
 
+bool f_time     = false;
+int8_t timefile = -1;
+char chbuf[100];
 
-main.cpp: //main.cpp
+void tckr1s(){
+    sec++;
+    if(sec > 59)   {sec = 0;     minute++;}
+    if(minute > 59){minute = 0; hour++;}
+    if(hour > 23)  {hour = 0;}
+    if(minute == 59 && sec == 50) f_time = true;  // flag will be set 10s before full hour
+    Serial.printf("%02d:%02d:%02d\n", hour, minute, sec);
+}
+
+void setup() {
+    Serial.begin(115200);
+    SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI);
+    SD.begin(SD_CS);
+    audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
+    audio.setVolume(10); // 0...21
+    ticker.attach(1, tckr1s);
+}
+
+void loop(){
+    audio.loop();
+    if(f_time == true){
+        f_time = false;
+        timefile = 3;
+        uint8_t next_hour = hour + 1;
+        if(next_hour == 25) next_hour = 1;
+        sprintf(chbuf, "/voice_time/%03d.mp3", next_hour);
+        audio.connecttoFS(SD, chbuf);
+    }
+}
+
+void audio_eof_mp3(const char *info){  //end of file
+    //Serial.printf("file :%s\n", info);
+    if(timefile>0){
+        if(timefile==1){audio.connecttoFS(SD, "/voice_time/080.mp3");     timefile--;}  // stroke
+        if(timefile==2){audio.connecttoFS(SD, "/voice_time/200.mp3");     timefile--;}  // precisely
+        if(timefile==3){audio.connecttoFS(SD, "/voice_time/O'clock.mp3"); timefile--;}
+    }
+}
+
+Can you integrate this into my main.cpp?
+https://github.com/jasonronalddavis/Arduino-Hexapod-App
+
 #include <Arduino.h>
 #include <NimBLEDevice.h>
 #include <NimBLEServer.h>
@@ -98,147 +86,133 @@ main.cpp: //main.cpp
 NimBLEServer* pServer = nullptr;
 NimBLECharacteristic* pCharacteristic = nullptr;
 bool deviceConnected = false;
-bool crawlf = false; // Variable to track crawling motion
-bool eyeY = false;
-bool eyeX= false;
+bool crawlf = false;
+bool crawlb = false;
+bool crawlL = false;
+bool crawlr = false;
 bool blink_up = false;
-bool blink_down = false;
-bool mouth = false;
+bool blink_down;
 
 void processReceivedData(const char* data);
-void moveEye(int data); // Function prototype declaration
-
 
 #define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 #define CHARACTERISTIC_UUID_RX "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 
 class MyCallbacks : public NimBLECharacteristicCallbacks {
-  void onWrite(NimBLECharacteristic* pCharacteristic) {
-    std::string rxValue = pCharacteristic->getValue();
-    if (rxValue.length() > 0) {
-      Serial.print("Received Value: ");
-      Serial.println(rxValue.c_str());
-      // Process the received data
-      processReceivedData(rxValue.c_str());
+    void onWrite(NimBLECharacteristic* pCharacteristic) {
+        std::string rxValue = pCharacteristic->getValue();
+        if (rxValue.length() > 0) {
+            processReceivedData(rxValue.c_str());
+        }
     }
-  }
-   void onConnect(NimBLEServer* pServer) {
-    Serial.println("Connected!");
-    Serial1.println("success");
-  }
-  void onDisconnect(NimBLEServer* pServer) {
-    Serial.println("Disconnected!");
-  }
+    void onConnect(NimBLEServer* pServer) {
+        Serial.println("Connected!");
+        Serial1.println("success");
+    }
+    void onDisconnect(NimBLEServer* pServer) {
+        Serial.println("Disconnected!");
+    }
 };
 
 void processReceivedData(const char* data) {
-  int dataAsInt = atoi(data);
-    moveEye(dataAsInt);
- 
-  if (dataAsInt == 83) {
-    Serial.println("Stretching..."); 
-    testStretch();
+    int dataAsInt = atoi(data);
+    Serial.print("-Axis to: "); 
+
+    // Reset all crawl states before setting a new one
     crawlf = false;
-  }
-  else if (dataAsInt == 18) {    
-    Serial.println("Lifting and Standing..."); 
-    testLift();
-    crawlf = false;
-  }
-  else if (dataAsInt == 13) {    
-    Serial.println("Lifting and Standing..."); 
-    testStand();
-    mouth = false;
+    crawlb = false;
+    crawlL = false;
+    crawlr = false;
 
-  }
-  else if (dataAsInt == 11) {    
-    Serial.println("Crawling forward..."); 
-    crawlf = true;
-  }
-  else if (dataAsInt == 15) {    
-       Serial.println("Blinking...");
-       mouth = false; 
-      eyeX= false;
-      eyeY= false;
-       blinkUp();
-  }
-  else if (dataAsInt == 16 ) {    
-       Serial.println("Blinking..."); 
-       mouth = false;
-      eyeX= false;
-      eyeY= false;
-       blinkDown();
-  }
-  else if (dataAsInt == 182){
-    eyeX= false;
-    eyeY= false;
-    blink_up = false;
-    blink_down = false;
-    mouthDown();
-  }
-  else if (dataAsInt == 183){
-    eyeY= false;
-    eyeX= false;
-    blink_up = false;
-    blink_down = false;
-    mouthUp();
-  }
+    if (dataAsInt == 20) {
+        mouthDown();
+    } else if (dataAsInt == 21) {
+        mouthUp();
+    } else if (strncmp(data, "x", 1) == 0) {
+        int eyeData = atoi(data + 1);
+        moveEyeballX(eyeData);
+        Serial.print("Adjusting Eyeball ");
+        Serial.println("x");
+        Serial.println(eyeData); 
+    } else if (strncmp(data, "y", 1) == 0) {
+        int eyeData = atoi(data + 1);
+        moveEyeballY(eyeData);
+        Serial.print("Adjusting Eyeball ");
+        Serial.println("y");
+        Serial.println(eyeData); 
+    } else if (strncmp(data, "e", 1) == 0) {
+        int eyeData = atoi(data + 1);
+        eyeLid(eyeData);
+        Serial.print("Adjusting Eyelid ");
+        Serial.println("e");
+        Serial.println(eyeData); 
+    } else if (strncmp(data, "S", 1) == 0) {
+        Serial.println("Stretching..."); 
+        testStretch();
+    } else if (strncmp(data, "U", 1) == 0) {
+        Serial.println("Lifting and Standing..."); 
+        testLift();
+    } else if (strncmp(data, "B", 1) == 0) {
+        Serial.println("Bending..."); 
+        testBend();
+    } else if (strncmp(data, "T", 1) == 0) {
+        Serial.println("Standing..."); 
+        testStand();
+    } else if (strncmp(data, "F", 1) == 0) {
+        Serial.println("Crawling forward..."); 
+        crawlf = true;
+    } else if (strncmp(data, "Z", 1) == 0) {
+        Serial.println("Crawling backward...");
+        crawlb = true;
+    } else if (strncmp(data, "R", 1) == 0) {
+        Serial.println("Crawling right...");
+        crawlr = true;
+    } else if (strncmp(data, "L", 1) == 0) {
+        Serial.println("Crawling left...");
+        crawlL = true;
+    } else if (strncmp(data, "d", 1) == 0) {
+        Serial.println("Blinking up...");
+        blinkUp();
+    } else if (strncmp(data, "b", 1) == 0) {
+        Serial.println("Blinking down...");
+        blinkDown();
+    }
 }
-
-
-void moveEye(int data){
-int eyeData = data;
-
-if (eyeData >= 0 && eyeData >= 180){
-   Serial.print("Adjusting Eyeball X-Axis to: "); 
-    Serial.println(eyeData);
-    blink_up = false;
-    blink_down = false;
-    eyeY= false;
-    moveEyeballX(eyeData);  
-}
-
- else if (eyeData >= 0 && eyeData >= 180){
-    Serial.print("Adjusting Eyeball Y-Axis to: "); 
-    blink_up = false;
-    blink_down = false;
-    eyeX= false;
-    Serial.println(eyeData);
-    moveEyeballY(eyeData);
-  }
-}
-
-
-
 
 void setup() {
-  Serial.begin(115200);
-  Serial1.begin(115200);
-  NimBLEDevice::init("PEANUT");
-  pServer = NimBLEDevice::createServer();
-  NimBLEService* pService = pServer->createService(SERVICE_UUID);
-  pCharacteristic = pService->createCharacteristic(
-      CHARACTERISTIC_UUID_RX,
-      NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::NOTIFY);
-  pCharacteristic->setCallbacks(new MyCallbacks());
-  pService->start();
-  NimBLEAdvertising* pAdvertising = pServer->getAdvertising();
-  pAdvertising->start();
-  initTest();
-  initMouth();
-  initEyes();
+    Serial.begin(115200);
+    Serial1.begin(115200);
+    NimBLEDevice::init("PEANUT");
+    pServer = NimBLEDevice::createServer();
+    NimBLEService* pService = pServer->createService(SERVICE_UUID);
+    pCharacteristic = pService->createCharacteristic(
+        CHARACTERISTIC_UUID_RX,
+        NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::NOTIFY
+    );
+    pCharacteristic->setCallbacks(new MyCallbacks());
+    pService->start();
+    NimBLEAdvertising* pAdvertising = pServer->getAdvertising();
+    pAdvertising->start();
+    initTest();
+    initMouth();
+    initEyes();
 }
 
 void loop() {
-//  crawlForward();
-  while (Serial1.available()) {
-    String receivedData = Serial1.readStringUntil('\n');
-    Serial.println("Barnes!");
-    Serial1.println(receivedData);
-    processReceivedData(receivedData.c_str());
-    // If crawlForward is true, continuously call the crawlForward function
-}
-if (crawlf == true){
-crawlForward();
-}
+    if (Serial1.available()) {
+        String receivedData = Serial1.readStringUntil('\n');
+        processReceivedData(receivedData.c_str());
+    }
+    if (crawlf) {
+        crawlForward();
+    }
+    if (crawlb) {
+        crawlBackward();
+    }
+    if (crawlL) {
+        crawlLeft();
+    }
+    if (crawlr) {
+        crawlRight();
+    }
 }

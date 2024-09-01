@@ -9,6 +9,13 @@
 #include "legs/crawlf.h"
 #include "Mouth/mouth.h"
 #include "test/test.h"
+#include "Audio.h"
+#include "SD.h"
+#include "FS.h"
+#include "Ticker.h"
+#include "chat/chat.h"
+#include <HTTPClient.h>
+#include <WiFi.h>
 
 NimBLEServer* pServer = nullptr;
 NimBLECharacteristic* pCharacteristic = nullptr;
@@ -19,6 +26,11 @@ bool crawlL = false;
 bool crawlr = false;
 bool blink_up = false;
 bool blink_down;
+const char* ssid = "ATTKpJiggs";
+const char* password = "3n6n2y776t5j";
+const char* serverName = "https://yourserver.com/api/speech";
+
+WiFiClient client;
 
 void processReceivedData(const char* data);
 
@@ -109,6 +121,19 @@ void processReceivedData(const char* data) {
 void setup() {
     Serial.begin(115200);
     Serial1.begin(115200);
+
+    // Initialize chat (voice commands) module immediately
+    initChat();
+
+    // Setup WiFi connection after chat initialization
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(1000);
+        Serial.println("Connecting to WiFi...");
+    }
+    Serial.println("Connected to WiFi");
+
+    // Initialize Bluetooth and other components
     NimBLEDevice::init("PEANUT");
     pServer = NimBLEDevice::createServer();
     NimBLEService* pService = pServer->createService(SERVICE_UUID);
@@ -125,11 +150,46 @@ void setup() {
     initEyes();
 }
 
+String audioToText() {
+    // Your implementation to capture and convert audio to text
+    Serial.println("Capturing audio...");
+    return "This is what I heard..."; // Placeholder for captured audio
+
+    // Simulate capturing audio and sending to server
+}
+
+void sendTextToServer(String text) {
+    if (WiFi.status() == WL_CONNECTED) {
+        HTTPClient http;
+        http.begin(client, serverName);
+        http.addHeader("Content-Type", "application/json");
+        String body = "{\"text\": \"" + text + "\"}";
+        int httpResponseCode = http.POST(body);
+        if (httpResponseCode > 0) {
+            String response = http.getString();
+            Serial.println("Server response: " + response);
+        } else {
+            Serial.println("Error on sending POST: " + httpResponseCode);
+        }
+        http.end();
+    } else {
+        Serial.println("WiFi Disconnected");
+    }
+}
+
 void loop() {
     if (Serial1.available()) {
         String receivedData = Serial1.readStringUntil('\n');
         processReceivedData(receivedData.c_str());
     }
+
+    // Handle audio playback
+    handleAudioLoop();
+
+    // Example: Capture audio and send to server
+    String capturedText = audioToText();
+    sendTextToServer(capturedText);
+
     if (crawlf) {
         crawlForward();
     }
