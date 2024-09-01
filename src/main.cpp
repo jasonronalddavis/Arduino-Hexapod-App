@@ -29,6 +29,7 @@ bool blink_down;
 const char* ssid = "ATTKpJiggs";
 const char* password = "3n6n2y776t5j";
 const char* serverName = "https://yourserver.com/api/speech";
+const char* myOpenAIKey = "Bearer YOUR_OPENAI_API_KEY"; // Include your API key here
 
 WiFiClient client;
 
@@ -150,19 +151,13 @@ void setup() {
     initEyes();
 }
 
-String audioToText() {
-    // Your implementation to capture and convert audio to text
-    Serial.println("Capturing audio...");
-    return "This is what I heard..."; // Placeholder for captured audio
-
-    // Simulate capturing audio and sending to server
-}
 
 void sendTextToServer(String text) {
     if (WiFi.status() == WL_CONNECTED) {
         HTTPClient http;
         http.begin(client, serverName);
         http.addHeader("Content-Type", "application/json");
+        http.addHeader("Authorization", myOpenAIKey);
         String body = "{\"text\": \"" + text + "\"}";
         int httpResponseCode = http.POST(body);
         if (httpResponseCode > 0) {
@@ -186,9 +181,9 @@ void loop() {
     // Handle audio playback
     handleAudioLoop();
 
-    // Example: Capture audio and send to server
-    String capturedText = audioToText();
-    sendTextToServer(capturedText);
+    // Example: Capture audio, convert it to text, and send to server
+    String capturedText = audioToText(); // Assuming you have a method to capture and convert audio to text
+    sendTextToServer(capturedText); // Send the captured text to your server using HTTP POST
 
     if (crawlf) {
         crawlForward();
