@@ -6,7 +6,7 @@ const char* ssid = "YourSSID";
 const char* password = "YourPassword";
 
 // API Keys
-const char* ApiKey = "YourAPIKey";
+const char* apiKey = "YourAPIKey";
 
 // Server details
 const char* server = "https://yourserver.com/api/speech";
