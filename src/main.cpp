@@ -9,13 +9,16 @@
 #include "legs/crawlf.h"
 #include "Mouth/mouth.h"
 #include "test/test.h"
+#include "chat/chat.h"
+#include "chat/cloudSpeechClient.h"
 #include "Audio.h"
 #include "SD.h"
 #include "FS.h"
 #include "Ticker.h"
-#include "chat/chat.h"
 #include <HTTPClient.h>
 #include <WiFi.h>
+#include "config.h"
+
 
 NimBLEServer* pServer = nullptr;
 NimBLECharacteristic* pCharacteristic = nullptr;
@@ -26,10 +29,7 @@ bool crawlL = false;
 bool crawlr = false;
 bool blink_up = false;
 bool blink_down;
-const char* ssid = "ATTKpJiggs";
-const char* password = "3n6n2y776t5j";
-const char* serverName = "https://yourserver.com/api/speech";
-const char* myOpenAIKey = "Bearer YOUR_OPENAI_API_KEY"; // Include your API key here
+
 
 WiFiClient client;
 
