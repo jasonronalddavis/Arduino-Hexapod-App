@@ -1,8 +1,7 @@
-#ifndef _AUDIO_H
-#define _AUDIO_H
-
+#ifndef AUDIO_H
+#define AUDIO_H
 #include <Arduino.h>
-#include "I2S.h"
+#include "chat.h"
 
 // 16bit, monoral, 16000Hz,  linear PCM
 class Audio {
