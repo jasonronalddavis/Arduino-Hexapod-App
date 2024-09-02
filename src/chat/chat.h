@@ -2,23 +2,36 @@
 #define CHAT_H
 
 #include <Arduino.h>
-#include "Audio.h"
-#include "Adafruit_PWMServoDriver.h"
-#include "FS.h"
-#include "SD.h"
-#include "SPI.h"
+#include "driver/i2s.h"  // Include the ESP32 I2S driver
+#include "esp_system.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
-extern Audio audio;
+// Define microphone types to be used with the I2S configuration
+enum MicType {
+    ADMP441,
+    ICS43434,
+    M5GO,
+    M5STACKFIRE
+};
 
-// Function declarations
-void initChat();
-void handleAudioLoop();
-void playVoiceCommand(const char* fileName);
-String audioToText();
+// I2S class to handle microphone input via I2S protocol
+class I2S {
+    i2s_bits_per_sample_t BITS_PER_SAMPLE;  // Bits per sample
+public:
+    I2S(MicType micType);  // Constructor with microphone type
+    int Read(char* data, int numData);  // Read data from I2S
+    int GetBitPerSample();  // Get the number of bits per sample
+};
+
+// Function prototypes
+void initI2S();  // Initialize I2S configuration
+String audioToText();  // Function to capture audio and convert to text
 
 // Constants for I2S configuration
 #define I2S_DOUT 25
 #define I2S_BCLK 27
 #define I2S_LRC 26
+#define SAMPLE_RATE 16000
 
 #endif // CHAT_H

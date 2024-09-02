@@ -26,8 +26,7 @@ void CloudSpeechClient::PrintHttpBody2(Audio* audio) {
     client.print(enc);
 
     for (int i = 0; i < audio->totalDataSize; i += audio->chunkSize) {
-        enc = base64::encode(audio->data + i, audio->chunkSize);
-        enc.replace("\n", "");
+String enc = base64::encode(reinterpret_cast<uint8_t*>(audio->paddedHeader), audio->headerSize);        enc.replace("\n", "");
         client.print(enc);
     }
 }

@@ -1,5 +1,7 @@
 #include "Audio.h"
 
+#include "Audio.h"
+
 Audio::Audio(MicType micType) {
   wavData = new char*[wavDataSize/dividedWavDataSize];
   for (int i = 0; i < wavDataSize/dividedWavDataSize; ++i) wavData[i] = new char[dividedWavDataSize];
