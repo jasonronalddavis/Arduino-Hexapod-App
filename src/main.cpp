@@ -18,7 +18,10 @@
 #include <HTTPClient.h>
 #include <WiFi.h>
 #include "config.h"
-
+#include "driver/i2s.h"  // Include the ESP32 I2S driver
+#include "esp_system.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 NimBLEServer* pServer = nullptr;
 NimBLECharacteristic* pCharacteristic = nullptr;

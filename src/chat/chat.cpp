@@ -42,7 +42,7 @@ String audioToText() {
     const int numSamples = 1024;
     char data[numSamples];
     size_t bytes_read;
-    audioInput.Read(data, numSamples); // Use the Read function from the I2S class
+    audioInput.read(data, numSamples); // Use the Read function from the I2S class
 
     if (bytes_read > 0) {
         Serial.println("Audio captured successfully.");

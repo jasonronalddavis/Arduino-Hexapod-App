@@ -1,10 +1,15 @@
 #include "CloudSpeechClient.h"
-#include "Audio.h" // Include your audio handling library
+#include "Audio.h" // Ensure this includes the definition for CustomAudio
 #include <base64.h>
 #include <ArduinoJson.h>
-#include "../config.h" // Make sure this file contains necessary network parameters
+#include "../config.h" // Ensure this contains the necessary configuration
 #include <HTTPClient.h>
 #include <Arduino.h>
+#include "driver/i2s.h"  // Include the ESP32 I2S driver
+#include "esp_system.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
 
 CloudSpeechClient::CloudSpeechClient(Authentication authentication) {
     this->authentication = authentication;
@@ -19,28 +24,27 @@ CloudSpeechClient::~CloudSpeechClient() {
     WiFi.disconnect();
 }
 
-void CloudSpeechClient::PrintHttpBody2(Audio* audio) {
-    // This function will encode and print the audio data in chunks
-    String enc = base64::encode(audio->paddedHeader, audio->headerSize); // Ensure these are defined in your Audio class
+void CloudSpeechClient::PrintHttpBody2(CustomAudio* audio) {
+    String enc = base64::encode(reinterpret_cast<const uint8_t*>(audio->paddedHeader), audio->headerSize);
     enc.replace("\n", "");
     client.print(enc);
 
     for (int i = 0; i < audio->totalDataSize; i += audio->chunkSize) {
-String enc = base64::encode(reinterpret_cast<uint8_t*>(audio->paddedHeader), audio->headerSize);        enc.replace("\n", "");
+        enc = base64::encode(reinterpret_cast<const uint8_t*>(audio->data + i), audio->chunkSize);
+        enc.replace("\n", "");
         client.print(enc);
     }
 }
 
-void CloudSpeechClient::Transcribe(Audio* audio) {
+void CloudSpeechClient::Transcribe(CustomAudio* audio) {
     String HttpBody1 = "{\"config\":{\"encoding\":\"LINEAR16\",\"sampleRateHertz\":16000,\"languageCode\":\"en-IN\"},\"audio\":{\"content\":\"";
     String HttpBody3 = "\"}}\r\n\r\n";
-    int httpBody2Length = (audio->totalDataSize + audio->headerSize) * 4 / 3; // Base64 encoding increases size by 1/3
+    int httpBody2Length = (audio->totalDataSize + audio->headerSize) * 4 / 3;
     String ContentLength = String(HttpBody1.length() + httpBody2Length + HttpBody3.length());
-
     String HttpHeader = "POST /v1/speech:recognize?key=" + apiKey +
                         " HTTP/1.1\r\nHost: speech.googleapis.com\r\nContent-Type: application/json\r\nContent-Length: " +
                         ContentLength + "\r\n\r\n";
-    
+
     client.print(HttpHeader);
     client.print(HttpBody1);
     PrintHttpBody2(audio);
@@ -50,4 +54,3 @@ void CloudSpeechClient::Transcribe(Audio* audio) {
     String response = client.readString();
     Serial.print("Response: "); Serial.println(response);
 }
-

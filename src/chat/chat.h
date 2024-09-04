@@ -17,11 +17,14 @@ enum MicType {
 
 // I2S class to handle microphone input via I2S protocol
 class I2S {
-    i2s_bits_per_sample_t BITS_PER_SAMPLE;  // Bits per sample
+    i2s_config_t i2s_config;  // I2S configuration struct
+    i2s_pin_config_t pin_config;  // Pin configuration for I2S
 public:
     I2S(MicType micType);  // Constructor with microphone type
-    int Read(char* data, int numData);  // Read data from I2S
-    int GetBitPerSample();  // Get the number of bits per sample
+    ~I2S();  // Destructor to clean up I2S
+    void setup();  // Setup I2S based on the MicType
+    int read(char* data, int numData);  // Read data from I2S
+    int getBitsPerSample() const;  // Get the number of bits per sample
 };
 
 // Function prototypes

@@ -1,20 +1,22 @@
 #include "Audio.h"
+#include "driver/i2s.h"  // Include the ESP32 I2S driver
+#include "esp_system.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
-#include "Audio.h"
-
-Audio::Audio(MicType micType) {
+CustomAudio::CustomAudio(MicType micType) {
   wavData = new char*[wavDataSize/dividedWavDataSize];
   for (int i = 0; i < wavDataSize/dividedWavDataSize; ++i) wavData[i] = new char[dividedWavDataSize];
   i2s = new I2S(micType);
 }
 
-Audio::~Audio() {
+CustomAudio::~CustomAudio() {
   for (int i = 0; i < wavDataSize/dividedWavDataSize; ++i) delete[] wavData[i];
   delete[] wavData;
   delete i2s;
 }
 
-void Audio::CreateWavHeader(byte* header, int waveDataSize){
+void CustomAudio::CreateWavHeader(byte* header, int waveDataSize){
   header[0] = 'R';
   header[1] = 'I';
   header[2] = 'F';
@@ -62,12 +64,12 @@ void Audio::CreateWavHeader(byte* header, int waveDataSize){
   header[43] = (byte)((waveDataSize >> 24) & 0xFF);
 }
 
-void Audio::Record() {
+void CustomAudio::Record() {
   CreateWavHeader(paddedHeader, wavDataSize);
-  int bitBitPerSample = i2s->GetBitPerSample();
+  int bitBitPerSample = i2s->getBitsPerSample();
   if (bitBitPerSample == 16) {
     for (int j = 0; j < wavDataSize/dividedWavDataSize; ++j) {
-      i2s->Read(i2sBuffer, i2sBufferSize/2);
+      i2s->read(i2sBuffer, i2sBufferSize/2);
       for (int i = 0; i < i2sBufferSize/8; ++i) {
         wavData[j][2*i] = i2sBuffer[4*i + 2];
         wavData[j][2*i + 1] = i2sBuffer[4*i + 3];
@@ -76,7 +78,7 @@ void Audio::Record() {
   }
   else if (bitBitPerSample == 32) {
     for (int j = 0; j < wavDataSize/dividedWavDataSize; ++j) {
-      i2s->Read(i2sBuffer, i2sBufferSize);
+      i2s->read(i2sBuffer, i2sBufferSize);
       for (int i = 0; i < i2sBufferSize/8; ++i) {
         wavData[j][2*i] = i2sBuffer[8*i + 2];
         wavData[j][2*i + 1] = i2sBuffer[8*i + 3];
