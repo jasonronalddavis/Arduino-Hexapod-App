@@ -122,10 +122,7 @@ void processReceivedData(const char* data) {
 void setup() {
     Serial.begin(115200);
     Serial1.begin(115200);
-
     // Initialize chat (voice commands) module immediately
-    initChat();
-
     // Setup WiFi connection after chat initialization
     WiFi.begin(ssid, password);
     while (WiFi.status() != WL_CONNECTED) {
@@ -155,9 +152,9 @@ void setup() {
 void sendTextToServer(String text) {
     if (WiFi.status() == WL_CONNECTED) {
         HTTPClient http;
-        http.begin(client, serverName);
+        http.begin(client, server);
         http.addHeader("Content-Type", "application/json");
-        http.addHeader("Authorization", myOpenAIKey);
+        http.addHeader("Authorization", apiKey);
         String body = "{\"text\": \"" + text + "\"}";
         int httpResponseCode = http.POST(body);
         if (httpResponseCode > 0) {
@@ -177,10 +174,7 @@ void loop() {
         String receivedData = Serial1.readStringUntil('\n');
         processReceivedData(receivedData.c_str());
     }
-
     // Handle audio playback
-    handleAudioLoop();
-
     // Example: Capture audio, convert it to text, and send to server
     String capturedText = audioToText(); // Assuming you have a method to capture and convert audio to text
     sendTextToServer(capturedText); // Send the captured text to your server using HTTP POST
