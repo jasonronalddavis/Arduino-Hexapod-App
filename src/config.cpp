@@ -2,8 +2,8 @@
 #include <Arduino.h>
 
 // WiFi credentials
-const char* ssid = "YourSSID";
-const char* password = "YourPassword";
+const char* ssid = "ATTKpJiggs";
+const char* password = "3n6n2y776t5j";
 
 // API Keys
 const String apiKey = "AIzaSyB_eFvcXt8CfCLd-fMd83Ze0bcwHRBdFFc";

@@ -1,6 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 #include <Arduino.h>
+#include "driver/i2s.h"
+
 
 // WiFi credentials
 extern const char* ssid;
