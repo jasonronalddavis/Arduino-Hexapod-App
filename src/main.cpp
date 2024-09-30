@@ -2,27 +2,27 @@
 #include <NimBLEDevice.h>
 #include <NimBLEServer.h>
 #include <NimBLEUtils.h>
-#include <Wire.h>
+// #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
 #include <SPI.h>
 #include "Eyes/eyes.h"
 #include "legs/crawlf.h"
+#include "Audio.h"
+#include "chat/cloudSpeechClient.h"
 #include "Mouth/mouth.h"
 #include "test/test.h"
-#include "chat/I2S.h"
-#include "chat/cloudSpeechClient.h"
-#include "Audio.h"
-#include "SD.h"
-#include "FS.h"
-#include "Ticker.h"
-#include <HTTPClient.h>
+// #include "SD.h"
+// #include "FS.h"
+// #include "Ticker.h"
+// #include <HTTPClient.h>
 #include <WiFi.h>
-#include "config.h"
-#include "driver/i2s.h"  // Include the ESP32 I2S driver
-#include "esp_system.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "esp_core_dump.h"
+#include <WiFiClientSecure.h>                       
+// #include "config.h"
+// #include "driver/i2s.h"  // Include the ESP32 I2S driver
+// #include "freertos/FreeRTOS.h"
+// #include "freertos/task.h"
+// #include "esp_core_dump.h"
+
 
 // ITwoS audioInput(INMP441);
 NimBLEServer* pServer = nullptr;
@@ -36,8 +36,61 @@ bool blink_up = false;
 bool blink_down;
 
 
-int32_t raw_samples[SAMPLE_BUFFER_SIZE];
-int16_t sBuffer_2[BUFFERLEN];
+
+
+const char* sSid = "iPhone";
+const char* passWord = "Barnes!!";
+
+// API Keys
+const char* apikey = "AIzaSyB_eFvcXt8CfCLd-fMd83Ze0bcwHRBdFFc";  // Use const char*// Server details
+
+
+ const char* s2tServer = "speech.googleapis.com";
+ const char* root_Ca =
+"-----BEGIN CERTIFICATE-----\n"
+"MIIF4DCCBMigAwIBAgIRAOvK+wvE9RNiCvEgVTZHYXMwDQYJKoZIhvcNAQELBQAw\n"
+"OzELMAkGA1UEBhMCVVMxHjAcBgNVBAoTFUdvb2dsZSBUcnVzdCBTZXJ2aWNlczEM\n"
+"MAoGA1UEAxMDV1IyMB4XDTI0MDgwNTA3MTgyMFoXDTI0MTAyODA3MTgxOVowIjEg\n"
+"MB4GA1UEAxMXdXBsb2FkLnZpZGVvLmdvb2dsZS5jb20wWTATBgcqhkjOPQIBBggq\n"
+"hkjOPQMBBwNCAATp8201ynPGaIqwfpq//m5duZr+OpqnZ6y5bJ74R9PK+d7t96Mc\n"
+"lQxJH+cdlsjQkcue/bRC+9gSqnCKBp5Q0qmao4IDwTCCA70wDgYDVR0PAQH/BAQD\n"
+"AgeAMBMGA1UdJQQMMAoGCCsGAQUFBwMBMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYE\n"
+"FI79jH9ydHKcCIuNsxDvjAyhbV3EMB8GA1UdIwQYMBaAFN4bHu15FdQ+NyTDIbvs\n"
+"NDltQrIwMFgGCCsGAQUFBwEBBEwwSjAhBggrBgEFBQcwAYYVaHR0cDovL28ucGtp\n"
+"Lmdvb2cvd3IyMCUGCCsGAQUFBzAChhlodHRwOi8vaS5wa2kuZ29vZy93cjIuY3J0\n"
+"MIIBmAYDVR0RBIIBjzCCAYuCF3VwbG9hZC52aWRlby5nb29nbGUuY29tghQqLmNs\n"
+"aWVudHMuZ29vZ2xlLmNvbYIRKi5kb2NzLmdvb2dsZS5jb22CEiouZHJpdmUuZ29v\n"
+"Z2xlLmNvbYITKi5nZGF0YS55b3V0dWJlLmNvbYIQKi5nb29nbGVhcGlzLmNvbYIT\n"
+"Ki5waG90b3MuZ29vZ2xlLmNvbYIXKi55b3V0dWJlLTNyZC1wYXJ0eS5jb22CEXVw\n"
+"bG9hZC5nb29nbGUuY29tghMqLnVwbG9hZC5nb29nbGUuY29tghJ1cGxvYWQueW91\n"
+"dHViZS5jb22CFCoudXBsb2FkLnlvdXR1YmUuY29tgh91cGxvYWRzLnN0YWdlLmdk\n"
+"YXRhLnlvdXR1YmUuY29tghViZy1jYWxsLWRvbmF0aW9uLmdvb2eCG2JnLWNhbGwt\n"
+"ZG9uYXRpb24tYWxwaGEuZ29vZ4IcYmctY2FsbC1kb25hdGlvbi1jYW5hcnkuZ29v\n"
+"Z4IZYmctY2FsbC1kb25hdGlvbi1kZXYuZ29vZzATBgNVHSAEDDAKMAgGBmeBDAEC\n"
+"ATA2BgNVHR8ELzAtMCugKaAnhiVodHRwOi8vYy5wa2kuZ29vZy93cjIvb1E2bnly\n"
+"OEYwbTAuY3JsMIIBAwYKKwYBBAHWeQIEAgSB9ASB8QDvAHYAdv+IPwq2+5VRwmHM\n"
+"9Ye6NLSkzbsp3GhCCp/mZ0xaOnQAAAGRIZ4zmgAABAMARzBFAiEAxX37LanL4NY9\n"
+"7wns4SdpAUINEMR4Lh9lUde0BBjEFcwCIDgAmvfg3TPH7DnwkGOE2IsGQMYOccnR\n"
+"BI2FCAvSIJt6AHUASLDja9qmRzQP5WoC+p0w6xxSActW3SyB2bu/qznYhHMAAAGR\n"
+"IZ4zjgAABAMARjBEAiBlKwkwkGleVLNPVbDEdqzcbpJWiAHq5PKaw5yvoeK7AAIg\n"
+"dvkctZDH2pYFJzhZW3+V+mtU7hZE28/p5XKzIKcnvVowDQYJKoZIhvcNAQELBQAD\n"
+"ggEBAJPwb4seiRTvhTekn1Zs3njA+r9SIJuXlrs2D1SuBq+jrnARdFfcyWTHHS5d\n"
+"RPFhEtvc1mXuV605tJ7iyokiGtEt7IbpwRr7ziBnIpXNUY8LZUZ+EeK8ZucuTAce\n"
+"jTUaLieiB/pBLR5tHJBds75O5c02X4lpxeOH/iClIVGJEnmYjVsSrzj+2NkaxEkI\n"
+"MYv1xfmkdx77XdMkMJecaKe6rs9WMgDTsq5LJ732oHvSFy9yCvJ0f8QnQfN0ijbm\n"
+"wD4QPz7MVggCKD15jXQ6G1aw0ieKJnyl5Ur/qXpnB/c361QIEE1y9mTWkpMO9RsL\n"
+"zE2ZUoihL3OnO+Fr0as8OnNIm4Q=\n"
+"-----END CERTIFICATE-----\n";
+
+
+
+String Httpheaderr = String("POST /v1/speech:recognize?key=") + apikey + " HTTP/1.1\r\nHost: speech.googleapis.com\r\nContent-Type: application/json\r\nContent-Length: 0\r\n\r\n";
+
+
+
+
+// int32_t raw_samples[SAMPLE_BUFFER_SIZE];
+// int16_t sBuffer_2[BUFFERLEN];
 
 // CustomAudio *audio;
 void processReceivedData(const char* data);
@@ -160,69 +213,105 @@ void processReceivedData(const char* data) {
 //   i2s_set_pin(I2S_PORT, &pin_config);
 // }
 
-
-
 void setup() {
-    Serial.begin(115200);
-    Serial1.begin(115200);
-   Serial.println(" ");
-   delay(1000);
-     // Initialize the CustomAudio system
-    // audio = new CustomAudio(MicType::INMP441);  // Assuming `MicType::I2S` is your microphone type
-    // audio->CreateWavHeader(audio->paddedHeader, CustomAudio::wavDataSize);
+ Serial.begin(115200);
+    delay(500);
+    Serial.println("\nInitializing...");
 
-    // // Initialize chat (voice commands) module immediately
-    // // Setup WiFi connection after chat initialization
-    // // WiFi.begin(ssid, password);
-    // // while (WiFi.status() != WL_CONNECTED) {
-    // //     delay(1000);
-    // //     Serial.println("Connecting to WiFi...");
-    // // }
-    // // Serial.println("Connected to WiFi");
+    // Connect to WiFi
+    WiFi.begin(sSid, passWord);
+    Serial.print("Connecting to WiFi...");
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(1000);
+        Serial.print(".");
+        int wifiStatus = WiFi.status();
+        Serial.print(" WiFi Status: ");
+        Serial.println(wifiStatus);
+    }
 
-    // // Initialize Bluetooth and other components
-    // NimBLEDevice::init("PEANUT");
-    // pServer = NimBLEDevice::createServer();
-    // NimBLEService* pService = pServer->createService(SERVICE_UUID);
-    // pCharacteristic = pService->createCharacteristic(
-    //     CHARACTERISTIC_UUID_RX,
-    //     NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::NOTIFY
-    // );
-    // pCharacteristic->setCallbacks(new MyCallbacks());
-    // pService->start();
-    // NimBLEAdvertising* pAdvertising = pServer->getAdvertising();
-    // pAdvertising->start();
+    Serial.println("\nConnected to WiFi");
+
+    // Setup WiFiClientSecure and connect to Google Speech-to-Text API
+    WiFiClientSecure client;
+    
+    // Set timeout and insecure mode for testing
+    client.setTimeout(5000);  // Set timeout to 5 seconds
+    client.setInsecure();     // Disable SSL certificate verification (for testing)
+
+    Serial.println("Attempting to connect to Google API server...");
+    if (!client.connect(s2tServer, 443)) {
+        Serial.println("Connection to server failed");
+    } else {
+        Serial.println("Connected to server successfully");
+
+        // Use the global Httpheaderr from config.h
+        client.print(Httpheaderr);
+        Serial.println("Sent request header.");
+        
+        Serial.println("Waiting for response...");
+        while (client.connected() && !client.available()) {
+            delay(10);
+            Serial.print(".");
+        }
+
+        String response = "";
+        while (client.available()) {
+            response += client.readString();
+        }
+
+        if (response.length() > 0) {
+            Serial.println("\nServer response:");
+            Serial.println(response);
+        } else {
+            Serial.println("\nNo response from server.");
+        }
+
+        client.stop();
+        Serial.println("Closed connection.");
+    }
+
+    // Start audio recording
+    customAudio* audio = new customAudio(INMP441);
+    audio->Record();
+    Serial.println("Recording Completed. Now Processing...");
+
+    // Send the recorded audio for transcription
+    CloudSpeechClient* cloudSpeechClient = new CloudSpeechClient(USE_APIKEY);
+    cloudSpeechClient->Transcribe(audio);
+
+    delete cloudSpeechClient;
+    delete audio;
+
+    // Initialize other components
     initTest();
     initMouth();
     initEyes();
-   i2s_driver_install(I2S_NUM_0, &audioInput.i2s_config, 0, NULL);
-    i2s_set_pin(I2S_NUM_0, &audioInput.pin_config);
-    i2s_start(I2S_PORT);
     delay(500);
 }
 
 
-void sendTextToServer(String text) {
-    if (WiFi.status() == WL_CONNECTED) {
-        HTTPClient http;
-        http.begin(client, "http://<your-server-url>/chat"); // Set your server URL here
-        http.addHeader("Content-Type", "application/json");
 
-        String body = "{\"text\": \"" + text + "\"}";
-        int httpResponseCode = http.POST(body);
+// void sendTextToServer(String text) {
+//     if (WiFi.status() == WL_CONNECTED) {
+//         HTTPClient http;
+//         http.begin(client, "http://<your-server-url>/chat"); // Set your server URL here
+//         http.addHeader("Content-Type", "application/json");
 
-        if (httpResponseCode > 0) {
-            String response = http.getString();
-            Serial.println("Server response: " + response);
-            playResponseFromServer(response);  // Play the chatbot's response
-        } else {
-            Serial.println("Error on sending POST: " + httpResponseCode);
-        }
-        http.end();
-    } else {
-        Serial.println("WiFi Disconnected");
-    }
-}
+//         String body = "{\"text\": \"" + text + "\"}";
+//         int httpResponseCode = http.POST(body);
+
+//         if (httpResponseCode > 0) {
+//             String response = http.getString();
+//             Serial.println("Server response: " + response);
+//             playResponseFromServer(response);  // Play the chatbot's response
+//         } else {
+//             Serial.println("Error on sending POST: " + httpResponseCode);
+//         }
+//         http.end();
+//     } else {
+//         Serial.println("WiFi Disconnected");
+//     }
+// }
 
 void playResponseFromServer(String response) {
     Serial.println("Playing response: " + response);
@@ -237,37 +326,37 @@ void playResponseFromServer(String response) {
 
 
 void loop() {
-    // False print statements to "lock range" on serial plotter display
-    int rangelimit = 3000;
-    Serial.print(rangelimit * -1);
-    Serial.print(" ");
-    Serial.print(rangelimit);
-    Serial.print(" ");
+    // // False print statements to "lock range" on serial plotter display
+    // int rangelimit = 3000;
+    // Serial.print(rangelimit * -1);
+    // Serial.print(" ");
+    // Serial.print(rangelimit);
+    // Serial.print(" ");
 
-    // Get I2S data and place in data buffer
-    size_t bytesIn = 0;
-    int16_t sBuffer_2[BUFFERLEN];
-    esp_err_t result = i2s_read(I2S_PORT, &sBuffer_2, BUFFERLEN, &bytesIn, portMAX_DELAY);
+    // // Get I2S data and place in data buffer
+    // size_t bytesIn = 0;
+    // int16_t sBuffer_2[BUFFERLEN];
+    // esp_err_t result = i2s_read(I2S_PORT, &sBuffer_2, BUFFERLEN, &bytesIn, portMAX_DELAY);
 
-    if (result == ESP_OK) {
-        // Read I2S data buffer
-        int16_t samples_read = bytesIn / 8;
-        if (samples_read > 0) {
-            float mean = 0;
-            for (int16_t i = 0; i < samples_read; ++i) {
-                mean += (sBuffer_2[i]);
-            }
+    // if (result == ESP_OK) {
+    //     // Read I2S data buffer
+    //     int16_t samples_read = bytesIn / 8;
+    //     if (samples_read > 0) {
+    //         float mean = 0;
+    //         for (int16_t i = 0; i < samples_read; ++i) {
+    //             mean += (sBuffer_2[i]);
+    //         }
 
-            // Average the data reading
-            mean /= samples_read;
+    //         // Average the data reading
+    //         mean /= samples_read;
 
-            // Noise gate: check if the signal exceeds the threshold
-            if (abs(mean) > noiseThreshold) {
-                Serial.println(mean);
-            }
-        }
-     }
-    }
+    //         // Noise gate: check if the signal exceeds the threshold
+    //         if (abs(mean) > noiseThreshold) {
+    //             Serial.println(mean);
+    //         }
+    //     }
+    //  }
+    // }
 // ...
 
 
@@ -305,3 +394,4 @@ void loop() {
     // }
 
     // Delay to prevent spamming server too frequently
+}

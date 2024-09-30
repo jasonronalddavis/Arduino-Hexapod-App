@@ -1,18 +1,22 @@
-#ifndef CONFIG_H
-#define CONFIG_H
-#include <Arduino.h>
-#include "driver/i2s.h"
+// #ifndef CONFIG_H
+// #define CONFIG_H
+// #include <Arduino.h>
 
 
-// WiFi credentials
-extern const char* ssid;
-extern const char* password;
+// // WiFi credentials
+// extern const char* ssid;
+// extern const char* password;
 
-// API Keys
-extern const String apiKey;
+// // API Key
+// extern const char* apiKey;
 
-// Server details
-extern const char* server;
-extern const char* root_ca;
+// // Google Cloud Speech-to-Text Server
+// extern const char* server;
 
-#endif // CONFIG_H
+// // SSL root certificate
+// extern const char* root_ca;
+
+// // HTTP Header for requests
+// extern String HttpHeader;
+
+// #endif // CONFIG_H

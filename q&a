@@ -1,1 +1,1 @@
-When I view the diagram setup fro esp32 + I2S INMP441, L/R is connected to ground. In your setup, you have 
+Before I concern myself with Audio output, I would like to proceed with implementing speech to text functionality. This concerns utilizing google speech to text api. I have a config file and cloudSpeechClient.cpp/.h file to integrate with I2S functionality. 

@@ -1,55 +1,64 @@
 #include "I2S.h"
-#include "driver/i2s.h"  // Include the ESP32 ITwoS driver
-#include "esp_system.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
 
+#define I2S_SD 15
+#define I2S_SCK 17
+#define PIN_I2S_LRC 16
+#define PIN_I2S_DIN 34
+#define SAMPLE_RATE 44100
+#define BUFFERLEN 64
+#define I2S_PORT I2S_NUM_0
+#define SAMPLE_BUFFER_SIZE 512
+#define noiseThreshold 50.0  // Adjust this value as needed for noise filtering
 
-// Declare the I2S object globally (can be changed based on your setup)
-ITwoS audioInput(INMP441);  // Example instantiation with INMP441 mic type
-
-// Constructor: Initializes the I2S driver based on the microphone type
+// Declare the ITwoS object globally (can be changed based on your setup)
 ITwoS::ITwoS(MicType micType) {
-    if (micType == INMP441) {
+    if (micType == M5GO || micType == M5STACKFIRE) {
         BITS_PER_SAMPLE = I2S_BITS_PER_SAMPLE_16BIT;
-        i2s_config = {
+        i2s_config_t i2s_config = {
+            .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_RX | I2S_MODE_TX | I2S_MODE_DAC_BUILT_IN | I2S_MODE_ADC_BUILT_IN),
+            .sample_rate = SAMPLE_RATE,
+            .bits_per_sample = BITS_PER_SAMPLE,
+            .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,
+            .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+            .intr_alloc_flags = 0,
+            .dma_buf_count = 2,
+            .dma_buf_len = 1024
+        };
+        i2s_driver_install(I2S_NUM_0, &i2s_config, 0, NULL);
+        i2s_set_adc_mode(ADC_UNIT_1, ADC1_CHANNEL_6);
+        i2s_set_clk(I2S_NUM_0, SAMPLE_RATE, BITS_PER_SAMPLE, I2S_CHANNEL_STEREO);
+        i2s_adc_enable(I2S_NUM_0);
+    } else if (micType == ADMP441 || micType == ICS43434) {
+        BITS_PER_SAMPLE = I2S_BITS_PER_SAMPLE_32BIT;
+        i2s_config_t i2s_config = {
             .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_RX),
             .sample_rate = SAMPLE_RATE,
             .bits_per_sample = BITS_PER_SAMPLE,
-            .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
-            .communication_format = (i2s_comm_format_t)(I2S_COMM_FORMAT_STAND_I2S),
+            .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,
+            .communication_format = I2S_COMM_FORMAT_STAND_I2S,
             .intr_alloc_flags = 0,
-            .dma_buf_count = 8,
-            .dma_buf_len = BUFFERLEN,
-            .use_apll = false
+            .dma_buf_count = 16,
+            .dma_buf_len = 60
         };
-
-        pin_config = {
-            .bck_io_num = I2S_SCK,
-            .ws_io_num = I2S_WS,
-            .data_out_num = I2S_PIN_NO_CHANGE,
-            .data_in_num = I2S_SD
-        };
-
-        // Install the I2S driver and configure the pins
-        i2s_driver_install(I2S_PORT, &i2s_config, 0, NULL);
-        i2s_set_pin(I2S_PORT, &pin_config);
+        i2s_pin_config_t pin_config;
+        pin_config.bck_io_num = I2S_SCK;
+        pin_config.ws_io_num = PIN_I2S_LRC;
+        pin_config.data_out_num = I2S_PIN_NO_CHANGE;
+        pin_config.data_in_num = PIN_I2S_DIN;
+        i2s_driver_install(I2S_NUM_0, &i2s_config, 0, NULL);
+        i2s_set_pin(I2S_NUM_0, &pin_config);
+        i2s_set_clk(I2S_NUM_0, SAMPLE_RATE, BITS_PER_SAMPLE, I2S_CHANNEL_STEREO);
     }
 }
 
-// Destructor: Uninstalls the I2S driver to clean up
-ITwoS::~ITwoS() {
-    i2s_driver_uninstall(I2S_PORT);
-}
 
-// Reads data from the I2S interface
-int ITwoS::read(char* data, int numData) {
+
+int ITwoS::Read(char* data, int numData) {
     size_t bytes_read;
-    i2s_read(I2S_PORT, data, numData, &bytes_read, portMAX_DELAY);
+    i2s_read(I2S_NUM_0, (void*)data, numData, &bytes_read, portMAX_DELAY);
     return bytes_read;
 }
-
 // Returns the number of bits per sample
-int ITwoS::getBitsPerSample() {
+int ITwoS::GetBitPerSample() {
     return (int)BITS_PER_SAMPLE;
 }
